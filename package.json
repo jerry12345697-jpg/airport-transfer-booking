@@ -1,0 +1,13 @@
+{
+  "name": "airport-transfer-booking",
+  "version": "1.0.1",
+  "description": "新竹機場接送預約與報價系統",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
