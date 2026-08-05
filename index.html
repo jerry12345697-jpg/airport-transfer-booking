@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18372863823"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'AW-18372863823');
-</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>💝心星⭐️機場接送</title>
@@ -230,10 +221,125 @@
     @media (max-width: 520px) {
       .row { flex-direction: column; gap: 0; }
     }
+  
+    /* 進站必讀 */
+    .terms-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(15, 32, 39, 0.92);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .terms-overlay.hidden { display: none; }
+    .terms-box {
+      background: #fff; border-radius: 16px;
+      max-width: 560px; width: 100%;
+      max-height: 90vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .terms-box h2 {
+      padding: 18px 20px 8px;
+      font-size: 1.15rem; color: #1e3c72; text-align: center;
+    }
+    .terms-hint {
+      text-align: center; font-size: 0.85rem; color: #b45309;
+      padding: 0 16px 8px;
+    }
+    .terms-scroll {
+      flex: 1; overflow-y: auto;
+      padding: 12px 20px 20px;
+      font-size: 0.88rem; line-height: 1.7; color: #333;
+      border-top: 1px solid #eee; border-bottom: 1px solid #eee;
+    }
+    .terms-scroll h3 { color: #1e3c72; margin: 14px 0 8px; font-size: 1rem; }
+    .terms-scroll ol { padding-left: 1.3em; }
+    .terms-scroll li { margin-bottom: 6px; }
+    .terms-actions {
+      padding: 14px 20px 18px;
+    }
+    .terms-actions label {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-weight: 500; font-size: 0.9rem; margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .terms-actions input[type="checkbox"] { width: auto; margin-top: 3px; }
+    .captcha-row {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 12px; flex-wrap: wrap;
+    }
+    .captcha-row input {
+      width: 80px; margin: 0; padding: 8px;
+    }
+    .terms-actions button {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff; border: none; border-radius: 12px;
+      font-size: 1.05rem; font-weight: 700; cursor: pointer;
+    }
+    .terms-actions button:disabled {
+      background: #cbd5e1; cursor: not-allowed;
+    }
+    .hp-field { position: absolute; left: -9999px; opacity: 0; height: 0; overflow: hidden; }
+    .container.locked { display: none; }
+
   </style>
 </head>
 <body>
-  <div class="container">
+  <!-- 進站必讀：注意事項＋防機器人 -->
+  <div class="terms-overlay" id="termsOverlay">
+    <div class="terms-box">
+      <h2>💝心星⭐️機場接送<br>請先閱讀注意事項與免責聲明</h2>
+      <p class="terms-hint">請滑動至最底部後，勾選同意並完成驗證，始可預約</p>
+      <div class="terms-scroll" id="termsScroll">
+        <h3>一、消費者注意事項</h3>
+        <ol>
+          <li>本表單僅供填寫接送／包車需求，<strong>送出或產生摘要不代表訂單已成立</strong>。</li>
+          <li>請確認摘要內容無誤後，<strong>自行複製並貼至官方 LINE 帳號</strong>，專人收到後始進入報價程序。</li>
+          <li>未貼至官方 LINE、或資料不全者，可能無法報價或聯繫。</li>
+          <li><strong>實際車資以專人報價並經雙方確認為準</strong>；網頁或口頭預估僅供參考。</li>
+          <li>夜間（約 22:00–06:00）、過年期間、偏遠地區、停靠點、大型行李、安全座椅、舉牌等，<strong>可能另計費用</strong>。</li>
+          <li>請盡早預約；臨時、尖峰、疏運期間可能無車可派。</li>
+          <li>出發前請再確認：時間、上下車地點、航班、人數與行李。</li>
+          <li>航班延誤、取消或改時間，請儘早透過 LINE／電話通知，以便調整。</li>
+          <li>乘車請依約定時間到達；逾時等候是否加價，以當次約定為準。</li>
+          <li><strong>航站免費等候時間</strong>：接機免費等候為 <strong>60 分鐘</strong>，自<strong>航班實際落地時間起算</strong>；超過 60 分鐘將另行產生等候費用，以當次報價或雙方確認為準。請下機後儘速通關、取行李並至約定會合點。</li>
+          <li>貴重物品請自行妥善保管；特殊行李請事先註明。</li>
+          <li><strong>兒童安全座椅（重要）</strong>：<strong>未滿 3 歲之兒童應依規定使用合格安全座椅</strong>。請於預約時勾選並加購。未事先加購致無法合法載運時，司機依法不得載送，<strong>本服務將不予履約出車</strong>；相關損失由預約方自行負擔。司機違規可能面臨罰則，故無法在無安全座椅情況下出車。</li>
+          <li>服務範圍與車型以當次可派遣車輛為準，必要時可能協調調整。</li>
+          <li>聯繫與報價請盡量透過<strong>官方 LINE</strong>。</li>
+          <li>行程中請遵守交通規則與司機安全提醒。</li>
+        </ol>
+        <h3>二、免責聲明</h3>
+        <ol>
+          <li>報價、時間與路線受路況、天氣、管制、事故、航班異動等影響，<strong>無法保證完全準點或與預估完全一致</strong>。</li>
+          <li>因不可抗力（天災、疫情、法令、機場關閉、嚴重塞車等）導致延誤、取消或變更，將盡力協助，惟不負擔超出約定範圍之損害賠償。</li>
+          <li>乘客因自身原因（遲到、資料錯誤、未接聽電話、未至約定地點、通關／取行李逾時、超過航站免費等候 60 分鐘、未為未滿 3 歲兒童加購安全座椅等）所生等候、空跑、取消或不履約，相關費用或損失由乘客／預約方負擔。</li>
+          <li>因未為未滿 3 歲兒童加購或提供符合規定之安全座椅致無法合法出車者，原因在預約方，本公司／司機不負強制出車義務及因此衍生之損害賠償責任。</li>
+          <li>車內遺失物請盡速聯繫；非因司機故意或重大過失造成之遺失、毀損，恕難負完全責任。</li>
+          <li>乘客車內行為、與第三人之糾紛或違反法令之行為，由乘客自行負責。</li>
+          <li>未完成報價確認、未約定付款與出發細節前，雙方均無強制出車義務。</li>
+          <li>網頁內容若有調整，以當下頁面與官方 LINE 回覆為準。</li>
+          <li>本聲明之解釋與爭議，以中華民國法律為準，並以服務所在地有管轄權之法院為第一審管轄法院。</li>
+        </ol>
+        <p style="margin-top:16px;color:#666;font-size:0.85rem;">— 文末 — 請繼續滑動並於下方確認 —</p>
+      </div>
+      <div class="terms-actions">
+        <input type="text" id="hpCompany" class="hp-field" tabindex="-1" autocomplete="off" placeholder="company">
+        <label>
+          <input type="checkbox" id="termsAgree" disabled>
+          <span>我已完整閱讀並同意上述注意事項與免責聲明</span>
+        </label>
+        <div class="captcha-row">
+          <span>防機器人驗證：<strong id="captchaQ"></strong> = </span>
+          <input type="number" id="captchaA" placeholder="答案" inputmode="numeric">
+        </div>
+        <button type="button" id="termsEnter" disabled>同意並開始預約</button>
+        <p id="termsErr" style="color:#dc2626;font-size:0.85rem;margin-top:8px;display:none;"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container locked" id="mainApp">
     <div class="header">
       <h1>💝心星⭐️機場接送</h1>
       <p>填寫需求 → 確認摘要 → 送出後由專人報價回覆</p>
@@ -727,6 +833,84 @@
     document.getElementById('btnCloseModal').addEventListener('click', function() {
       document.getElementById('confirmModal').classList.remove('show');
     });
+
+
+    // ===== 進站必讀 + 防機器人 =====
+    (function() {
+      const overlay = document.getElementById('termsOverlay');
+      const scrollEl = document.getElementById('termsScroll');
+      const agree = document.getElementById('termsAgree');
+      const btn = document.getElementById('termsEnter');
+      const main = document.getElementById('mainApp');
+      const err = document.getElementById('termsErr');
+      let scrolledBottom = false;
+      const n1 = Math.floor(Math.random() * 8) + 2;
+      const n2 = Math.floor(Math.random() * 8) + 1;
+      document.getElementById('captchaQ').textContent = n1 + ' + ' + n2;
+      window.__captchaAns = n1 + n2;
+      const pageOpenAt = Date.now();
+
+      function checkReady() {
+        const okScroll = scrolledBottom;
+        const okAgree = agree.checked;
+        const ans = parseInt(document.getElementById('captchaA').value, 10);
+        const okCap = ans === window.__captchaAns;
+        btn.disabled = !(okScroll && okAgree && okCap);
+      }
+
+      scrollEl.addEventListener('scroll', function() {
+        const el = scrollEl;
+        if (el.scrollTop + el.clientHeight >= el.scrollHeight - 20) {
+          scrolledBottom = true;
+          agree.disabled = false;
+        }
+        checkReady();
+      });
+
+      // 內容過短時仍可標記（保險）
+      setTimeout(function() {
+        if (scrollEl.scrollHeight <= scrollEl.clientHeight + 5) {
+          scrolledBottom = true;
+          agree.disabled = false;
+          checkReady();
+        }
+      }, 500);
+
+      agree.addEventListener('change', checkReady);
+      document.getElementById('captchaA').addEventListener('input', checkReady);
+
+      btn.addEventListener('click', function() {
+        err.style.display = 'none';
+        // 蜜罐：機器人常會填
+        if (document.getElementById('hpCompany').value) {
+          err.textContent = '驗證失敗，請重試';
+          err.style.display = 'block';
+          return;
+        }
+        // 開啟後過短時間就送出，疑似機器人
+        if (Date.now() - pageOpenAt < 2500) {
+          err.textContent = '請確實閱讀後再繼續';
+          err.style.display = 'block';
+          return;
+        }
+        if (!scrolledBottom || !agree.checked) {
+          err.textContent = '請滑動至文末並勾選同意';
+          err.style.display = 'block';
+          return;
+        }
+        if (parseInt(document.getElementById('captchaA').value, 10) !== window.__captchaAns) {
+          err.textContent = '驗證題答案錯誤';
+          err.style.display = 'block';
+          return;
+        }
+        overlay.classList.add('hidden');
+        main.classList.remove('locked');
+        try { sessionStorage.setItem('termsOk', '1'); } catch(e) {}
+      });
+
+      // 同セッション已同意可跳過（重新整理仍需閱讀可拿掉這段）
+      // 依需求：每次進入都要閱讀，故不自動跳過
+    })();
 
   </script>
 </body>
