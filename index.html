@@ -17,14 +17,75 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
       background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      background-attachment: fixed;
       min-height: 100vh;
       padding: 20px;
       color: #333;
+      transition: background 0.6s ease;
     }
+    body.theme-ready {
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: inherit;
+      z-index: -2;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.28);
+      z-index: -1;
+      pointer-events: none;
+    }
+    .season-banner {
+      max-width: 640px;
+      margin: 0 auto 12px;
+      text-align: center;
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+    .season-banner strong { font-size: 1.05rem; }
+    .zodiac-card {
+      max-width: 640px;
+      margin: 0 auto 14px;
+      background: rgba(255,255,255,0.92);
+      border-radius: 14px;
+      padding: 12px 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #333;
+    }
+    .zodiac-card h3 {
+      font-size: 0.95rem;
+      color: #1e3c72;
+      margin-bottom: 6px;
+    }
+    .zodiac-card .zodiac-today {
+      color: #b45309;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .zodiac-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 10px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    .zodiac-list span { color: #555; }
     .container {
       max-width: 640px;
       margin: 0 auto;
-      background: white;
+      background: rgba(255,255,255,0.97);
       border-radius: 16px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
       overflow: hidden;
@@ -339,6 +400,12 @@
     </div>
   </div>
 
+  <div class="season-banner" id="seasonBanner" style="display:none;"></div>
+  <div class="zodiac-card" id="zodiacCard" style="display:none;">
+    <h3>✨ 今日星座小語</h3>
+    <div class="zodiac-today" id="zodiacToday"></div>
+    <div class="zodiac-list" id="zodiacList"></div>
+  </div>
   <div class="container locked" id="mainApp">
     <div class="header">
       <h1>💝心星⭐️機場接送</h1>
@@ -544,6 +611,141 @@
   </div>
 
   <script>
+
+    // ===== 每月台灣季節／景點背景 + 星座每日小語 =====
+    (function() {
+      const monthThemes = [
+        { // 1
+          name: '一月・冬日溫泉與山城',
+          desc: '陽明山、北投溫泉季，山嵐與暖湯的台灣冬景',
+          gradient: 'linear-gradient(160deg, #1a2744 0%, #3d5a80 45%, #98c1d9 100%)',
+          image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80'
+        },
+        {
+          name: '二月・過年燈會與春意',
+          desc: '燈會、廟口與早春花開，迎接新的一年',
+          gradient: 'linear-gradient(160deg, #4a1942 0%, #c73e1d 50%, #f4a261 100%)',
+          image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600&q=80'
+        },
+        {
+          name: '三月・櫻花與客家桐花',
+          desc: '櫻花、桐花紛飛，山林轉為柔粉與雪白',
+          gradient: 'linear-gradient(160deg, #5c4d7a 0%, #e8a0bf 50%, #fde2e4 100%)',
+          image: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1600&q=80'
+        },
+        {
+          name: '四月・踏青與海風',
+          desc: '郊山健行、海岸線微風，適合出遊的暖春',
+          gradient: 'linear-gradient(160deg, #1b4332 0%, #52b788 50%, #d8f3dc 100%)',
+          image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600&q=80'
+        },
+        {
+          name: '五月・端午與綠意',
+          desc: '滿眼新綠、粽香時節，城市與田野都醒了',
+          gradient: 'linear-gradient(160deg, #081c15 0%, #2d6a4f 50%, #95d5b2 100%)',
+          image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80'
+        },
+        {
+          name: '六月・夏至與蔚藍海岸',
+          desc: '墾丁、東北角與漁港，陽光與海的台灣夏日',
+          gradient: 'linear-gradient(160deg, #023e8a 0%, #0077b6 45%, #90e0ef 100%)',
+          image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80'
+        },
+        {
+          name: '七月・盛夏與山巔',
+          desc: '合歡山、清境與高山涼意，逃離平地暑氣',
+          gradient: 'linear-gradient(160deg, #1d3557 0%, #457b9d 50%, #a8dadc 100%)',
+          image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=80'
+        },
+        {
+          name: '八月・晚夏與夜市燈火',
+          desc: '星空、海風與夜市人情，台灣最有味道的夜晚',
+          gradient: 'linear-gradient(160deg, #3d0c11 0%, #9b2226 45%, #ee9b00 100%)',
+          image: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1600&q=80'
+        },
+        {
+          name: '九月・中秋與月色',
+          desc: '明月、茶香與秋涼，適合出遊賞月的時節',
+          gradient: 'linear-gradient(160deg, #22223b 0%, #4a4e69 50%, #c9ada7 100%)',
+          image: 'https://images.unsplash.com/photo-1532693322450-2cb5c511067d?w=1600&q=80'
+        },
+        {
+          name: '十月・秋旅與金黃',
+          desc: '落羽松、金黃稻浪與溫暖秋陽',
+          gradient: 'linear-gradient(160deg, #6b3a2a 0%, #d4a373 50%, #faedcd 100%)',
+          image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1600&q=80'
+        },
+        {
+          name: '十一月・秋末與煙波',
+          desc: '日月潭、阿里山雲海，霧氣中的詩意台灣',
+          gradient: 'linear-gradient(160deg, #2b2d42 0%, #8d99ae 50%, #edf2f4 100%)',
+          image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600&q=80'
+        },
+        {
+          name: '十二月・耶誕與暖冬',
+          desc: '城市燈飾、溫泉與跨年氣氛，為一年畫下溫柔句點',
+          gradient: 'linear-gradient(160deg, #1b1464 0%, #6c3483 50%, #f5b7b1 100%)',
+          image: 'https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=1600&q=80'
+        }
+      ];
+
+      const zodiacTips = [
+        { sign: '牡羊座', tip: '行動力高，適合敲定行程與出發時間。' },
+        { sign: '金牛座', tip: '重實用，先確認行李與車型最安心。' },
+        { sign: '雙子座', tip: '資訊多，記得把航班與會合點寫清楚。' },
+        { sign: '巨蟹座', tip: '顧家溫暖，接送親友時多留一點彈性。' },
+        { sign: '獅子座', tip: '大氣自信，今日適合安排舒適的車程。' },
+        { sign: '處女座', tip: '細節控，再核對一次時間與地址更好。' },
+        { sign: '天秤座', tip: '追求平衡，提早預約可少些臨時壓力。' },
+        { sign: '天蠍座', tip: '專注深沉，重要行程交給可靠接送。' },
+        { sign: '射手座', tip: '愛自由，長途接送也能當成小旅行。' },
+        { sign: '摩羯座', tip: '務實穩健，先報價再出發最踏實。' },
+        { sign: '水瓶座', tip: '想法獨特，試試線上預約更有效率。' },
+        { sign: '雙魚座', tip: '感性柔軟，路上放鬆欣賞沿途風景。' }
+      ];
+
+      const now = new Date();
+      const m = now.getMonth(); // 0-11
+      const theme = monthThemes[m];
+      const day = now.getDate();
+
+      // 背景：先漸層，圖載入成功再疊圖
+      document.body.style.background = theme.gradient;
+      const img = new Image();
+      img.onload = function() {
+        document.body.style.backgroundImage =
+          'linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.4)), url(\'' + theme.image + '\')';
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundAttachment = 'fixed';
+        document.body.classList.add('theme-ready');
+      };
+      img.onerror = function() {
+        document.body.style.background = theme.gradient;
+      };
+      img.src = theme.image;
+
+      const banner = document.getElementById('seasonBanner');
+      if (banner) {
+        banner.innerHTML = '<strong>' + theme.name + '</strong><br>' + theme.desc;
+      }
+
+      // 每日小語：依「今天日期」輪換一句總提示 + 十二星座
+      const dailyIdx = (now.getFullYear() * 1000 + (m + 1) * 50 + day) % zodiacTips.length;
+      const todayTip = zodiacTips[dailyIdx];
+      const zToday = document.getElementById('zodiacToday');
+      if (zToday) {
+        zToday.textContent = '今日亮點「' + todayTip.sign + '」：' + todayTip.tip;
+      }
+      const zList = document.getElementById('zodiacList');
+      if (zList) {
+        zList.innerHTML = zodiacTips.map(function(z) {
+          return '<span><strong>' + z.sign + '</strong> ' + z.tip + '</span>';
+        }).join('');
+      }
+    })();
+
+
     const cnyRanges = [
       ['2026-02-14', '2026-02-23'],
       ['2027-02-04', '2027-02-14'],
@@ -905,6 +1107,10 @@
         }
         overlay.classList.add('hidden');
         main.classList.remove('locked');
+        var sb = document.getElementById('seasonBanner');
+        var zc = document.getElementById('zodiacCard');
+        if (sb) sb.style.display = 'block';
+        if (zc) zc.style.display = 'block';
         try { sessionStorage.setItem('termsOk', '1'); } catch(e) {}
       });
 
