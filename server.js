@@ -16,6 +16,65 @@ app.use(express.json());
 app.use(express.static(__dirname));
 
 
+
+// ===== Google 試算表寫入（不會因重新部署而消失）=====
+let sheetsClient = null;
+
+function getSheetsClient() {
+  if (sheetsClient) return sheetsClient;
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (!raw) return null;
+  try {
+    const { google } = require('googleapis');
+    const creds = JSON.parse(raw);
+    const auth = new google.auth.GoogleAuth({
+      credentials: creds,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets']
+    });
+    sheetsClient = google.sheets({ version: 'v4', auth });
+    return sheetsClient;
+  } catch (e) {
+    console.error('Google 憑證解析失敗', e.message);
+    return null;
+  }
+}
+
+async function appendBookingToSheet(booking) {
+  const sheetId = process.env.GOOGLE_SHEET_ID;
+  const sheets = getSheetsClient();
+  if (!sheetId || !sheets) {
+    console.log('未設定 GOOGLE_SHEET_ID 或 GOOGLE_SERVICE_ACCOUNT_JSON，略過試算表');
+    return;
+  }
+  const row = [
+    booking.createdAt || '',
+    booking.orderId || '',
+    booking.name || '',
+    booking.phone || '',
+    booking.lineId || '',
+    booking.serviceType || '',
+    booking.date || '',
+    booking.pickupTime || '',
+    booking.fromAddress || '',
+    booking.toAddress || '',
+    booking.passengers || '',
+    booking.notes || '',
+    booking.visitCount || ''
+  ];
+  try {
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: sheetId,
+      range: 'A:M',
+      valueInputOption: 'USER_ENTERED',
+      requestBody: { values: [row] }
+    });
+    console.log('已寫入 Google 試算表', booking.orderId);
+  } catch (e) {
+    console.error('寫入試算表失敗', e.message);
+  }
+}
+
+
 const CSV_PATH = path.join(__dirname, 'bookings.csv');
 const CUSTOMERS_PATH = path.join(__dirname, 'customers.json');
 const ADMIN_KEY = process.env.ADMIN_KEY || 'xinxing2026';
@@ -242,6 +301,9 @@ app.post('/api/booking', function(req, res) {
     const customer = upsertCustomer(booking);
     booking.visitCount = customer.bookingCount;
     notifyLine(booking);
+    appendBookingToSheet(booking).catch(function(e) {
+      console.error('sheet append', e.message);
+    });
 
     res.json({
       success: true,

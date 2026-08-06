@@ -12,6 +12,8 @@
     .row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
     input { padding: 10px 12px; border: 1.5px solid #d0d7de; border-radius: 8px; font-size: 1rem; min-width: 200px; }
     button { padding: 10px 18px; background: #1e3c72; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .btn-del { padding: 6px 10px; background: #dc2626; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    .btn-del:hover { background: #b91c1c; }
     table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
     th, td { border-bottom: 1px solid #e5e7eb; padding: 10px 8px; text-align: left; }
     th { background: #f8fafc; color: #1e3c72; }
@@ -24,6 +26,7 @@
 <body>
   <div class="box">
     <h1>💝 客戶預約次數後台</h1>
+    <p class="warn">⚠️ 若 Railway <strong>重新部署</strong>，主機上的客戶名單可能被清空（雲端常見限制）。部署完成後請再預約測試一次寫入；長期資料可之後改存 Google 試算表。</p>
     <p class="hint">
       以<strong>手機號碼</strong>為主辨識回流客（並比對 LINE ID）。<br>
       次數可作為未來發放優惠券的依據。請妥善保管後台金鑰，勿公開分享此頁連結＋金鑰。
@@ -45,6 +48,7 @@
             <th>首次預約</th>
             <th>最近一次</th>
             <th>最近訂單</th>
+            <th>操作</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -65,10 +69,12 @@
         }
         document.getElementById('summary').textContent = '共 ' + data.total + ' 位客戶（依預約次數排序）';
         const tb = document.getElementById('tbody');
+        window.__adminKey = key;
         tb.innerHTML = (data.customers || []).map(function(c) {
           const n = c.bookingCount || 0;
           const badge = n >= 3 ? 'badge hot' : 'badge';
-          return '<tr>' +
+          const ck = encodeURIComponent(c.key || '');
+          return '<tr data-key="' + (c.key || '').replace(/"/g, '') + '">' +
             '<td><span class="' + badge + '">' + n + ' 次</span></td>' +
             '<td>' + (c.name || '—') + '</td>' +
             '<td>' + (c.phone || '—') + '</td>' +
@@ -76,8 +82,28 @@
             '<td>' + (c.firstBookingAt || '—') + '</td>' +
             '<td>' + (c.lastBookingAt || '—') + '</td>' +
             '<td>' + (c.lastOrderId || '—') + '</td>' +
+            '<td><button type="button" class="btn-del" data-key="' + (c.key || '').replace(/"/g, '&quot;') + '" data-name="' + (c.name || c.phone || '此客戶').replace(/"/g, '') + '">刪除</button></td>' +
             '</tr>';
         }).join('');
+        tb.querySelectorAll('.btn-del').forEach(function(btn) {
+          btn.onclick = async function() {
+            const ck = btn.getAttribute('data-key');
+            const nm = btn.getAttribute('data-name') || '此客戶';
+            if (!confirm('確定要刪除「' + nm + '」的客戶明細嗎？\n刪除後預約次數紀錄將無法復原。')) return;
+            try {
+              const res = await fetch('/api/admin/customers?key=' + encodeURIComponent(window.__adminKey) + '&customerKey=' + encodeURIComponent(ck), { method: 'DELETE' });
+              const data = await res.json();
+              if (!res.ok) {
+                alert(data.error || '刪除失敗');
+                return;
+              }
+              alert('已刪除');
+              document.getElementById('btnLoad').click();
+            } catch (e) {
+              alert('連線失敗');
+            }
+          };
+        });
       } catch (e) {
         msg.innerHTML = '<p class="err">連線失敗</p>';
       }
