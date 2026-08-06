@@ -19,32 +19,50 @@ app.use(express.static(__dirname));
 
 // ===== Google 試算表寫入（不會因重新部署而消失）=====
 let sheetsClient = null;
+let sheetsClientError = null;
+
+function parseServiceAccountJson() {
+  let raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (!raw) return null;
+  raw = String(raw).trim();
+  try {
+    if (raw.charAt(0) !== '{') {
+      raw = Buffer.from(raw, 'base64').toString('utf8');
+    }
+    return JSON.parse(raw);
+  } catch (e) {
+    sheetsClientError = 'JSON 解析失敗: ' + e.message;
+    console.error(sheetsClientError);
+    return null;
+  }
+}
 
 function getSheetsClient() {
   if (sheetsClient) return sheetsClient;
-  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-  if (!raw) return null;
   try {
     const { google } = require('googleapis');
-    const creds = JSON.parse(raw);
+    const creds = parseServiceAccountJson();
+    if (!creds) return null;
     const auth = new google.auth.GoogleAuth({
       credentials: creds,
       scopes: ['https://www.googleapis.com/auth/spreadsheets']
     });
     sheetsClient = google.sheets({ version: 'v4', auth });
+    sheetsClientError = null;
     return sheetsClient;
   } catch (e) {
-    console.error('Google 憑證解析失敗', e.message);
+    sheetsClientError = e.message;
+    console.error('Google 客戶端失敗', e.message);
     return null;
   }
 }
 
 async function appendBookingToSheet(booking) {
-  const sheetId = process.env.GOOGLE_SHEET_ID;
+  const sheetId = (process.env.GOOGLE_SHEET_ID || '').trim();
   const sheets = getSheetsClient();
   if (!sheetId || !sheets) {
-    console.log('未設定 GOOGLE_SHEET_ID 或 GOOGLE_SERVICE_ACCOUNT_JSON，略過試算表');
-    return;
+    console.log('略過試算表:', !sheetId ? '無 GOOGLE_SHEET_ID' : (sheetsClientError || '無憑證'));
+    return { ok: false, error: sheetsClientError || 'missing config' };
   }
   const row = [
     booking.createdAt || '',
@@ -57,48 +75,34 @@ async function appendBookingToSheet(booking) {
     booking.pickupTime || '',
     booking.fromAddress || '',
     booking.toAddress || '',
-    booking.passengers || '',
+    String(booking.passengers != null ? booking.passengers : ''),
     booking.notes || '',
-    booking.visitCount || ''
+    String(booking.visitCount != null ? booking.visitCount : '')
   ];
-  try {
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: sheetId,
-      range: 'A:M',
-      valueInputOption: 'USER_ENTERED',
-      requestBody: { values: [row] }
-    });
-    console.log('已寫入 Google 試算表', booking.orderId);
-  } catch (e) {
-    console.error('寫入試算表失敗', e.message);
+  const ranges = ['工作表1!A:M', 'Sheet1!A:M', 'A:M'];
+  let lastErr = null;
+  for (let i = 0; i < ranges.length; i++) {
+    try {
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: sheetId,
+        range: ranges[i],
+        valueInputOption: 'USER_ENTERED',
+        insertDataOption: 'INSERT_ROWS',
+        requestBody: { values: [row] }
+      });
+      console.log('已寫入 Google 試算表', ranges[i], booking.orderId);
+      return { ok: true };
+    } catch (e) {
+      lastErr = e.message;
+    }
   }
+  console.error('寫入試算表失敗', lastErr);
+  return { ok: false, error: lastErr };
 }
 
-
-const CSV_PATH = path.join(__dirname, 'bookings.csv');
 const CUSTOMERS_PATH = path.join(__dirname, 'customers.json');
-function getAdminKeyExpected() {
-  return String(process.env.ADMIN_KEY || 'xinxing2026').trim();
-}
 
-function getAdminKeyFromReq(req) {
-  const q = req.query && req.query.key;
-  const h = req.headers && (req.headers['x-admin-key'] || req.headers['X-Admin-Key']);
-  const b = req.body && req.body.key;
-  return String(q || h || b || '').trim();
-}
 
-function adminUnauthorized(res, key) {
-  const expected = getAdminKeyExpected();
-  return res.status(401).json({
-    error: '未授權',
-    inputLen: key.length,
-    expectedLen: expected.length,
-    hint: expected.length === 11 && !process.env.ADMIN_KEY
-      ? '目前使用預設金鑰（若你有設 ADMIN_KEY 卻仍如此，代表變數未生效）'
-      : '請使用 Railway 裡 ADMIN_KEY 的完整值（不是預設 xinxing2026）'
-  });
-}
 
 
 
@@ -282,7 +286,7 @@ function notifyLine(booking) {
   req.end();
 }
 
-app.post('/api/booking', function(req, res) {
+app.post('/api/booking', async function(req, res) {
   try {
     const data = req.body;
     if (!data.name || !data.phone || !data.fromAddress || !data.toAddress || !data.date || !data.pickupTime) {
@@ -324,15 +328,21 @@ app.post('/api/booking', function(req, res) {
     const customer = upsertCustomer(booking);
     booking.visitCount = customer.bookingCount;
     notifyLine(booking);
-    appendBookingToSheet(booking).catch(function(e) {
+    let sheetResult = { ok: false };
+    try {
+      sheetResult = await appendBookingToSheet(booking);
+    } catch (e) {
+      sheetResult = { ok: false, error: e.message };
       console.error('sheet append', e.message);
-    });
+    }
 
     res.json({
       success: true,
       orderId: orderId,
       visitCount: customer.bookingCount,
       isReturning: customer.bookingCount > 1,
+      sheetOk: !!(sheetResult && sheetResult.ok),
+      sheetError: sheetResult && sheetResult.error ? String(sheetResult.error).slice(0, 200) : undefined,
       message: '已送出，專人將盡快報價'
     });
   } catch (err) {
@@ -413,46 +423,11 @@ app.get('/api/horoscope', function(req, res) {
 
 // 後台：客戶預約次數（發放優惠依據）
 
-app.delete('/api/admin/customers', function(req, res) {
-  const key = getAdminKeyFromReq(req);
-  if (key !== getAdminKeyExpected()) {
-    return adminUnauthorized(res, key);
-  }
-  const customerKey = (req.query.customerKey || (req.body && req.body.customerKey) || '').trim();
-  if (!customerKey) {
-    return res.status(400).json({ error: '缺少 customerKey' });
-  }
-  const customers = loadCustomers();
-  if (!customers[customerKey]) {
-    return res.status(404).json({ error: '找不到此客戶' });
-  }
-  const removed = customers[customerKey];
-  delete customers[customerKey];
-  saveCustomers(customers);
-  res.json({ ok: true, removed: removed, total: Object.keys(customers).length });
-});
 
-app.get('/api/admin/ping', function(req, res) {
-  const key = getAdminKeyFromReq(req);
-  const expected = getAdminKeyExpected();
-  res.json({
-    ok: key === expected,
-    inputLen: key.length,
-    expectedLen: expected.length,
-    envSet: !!process.env.ADMIN_KEY
-  });
-});
 
-app.get('/api/admin/customers', function(req, res) {
-  const key = getAdminKeyFromReq(req);
-  if (key !== getAdminKeyExpected()) {
-    return adminUnauthorized(res, key);
-  }
-  const customers = loadCustomers();
-  const list = Object.keys(customers).map(function(k) { return customers[k]; });
-  list.sort(function(a, b) { return (b.bookingCount || 0) - (a.bookingCount || 0); });
-  res.json({ ok: true, total: list.length, customers: list });
-});
+
+
+
 
 
 const VIEWS_PATH = path.join(__dirname, 'views.json');
@@ -485,6 +460,25 @@ app.get('/api/views', function(req, res) {
 app.get('/api/views/count', function(req, res) {
   const data = loadViews();
   res.json({ ok: true, total: data.total || 0 });
+});
+
+app.get('/api/sheet-status', function(req, res) {
+  const hasId = !!(process.env.GOOGLE_SHEET_ID || '').trim();
+  const hasJson = !!(process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '').trim();
+  let clientOk = false;
+  let err = sheetsClientError || null;
+  try {
+    clientOk = !!getSheetsClient();
+  } catch (e) {
+    err = e.message;
+  }
+  res.json({
+    ok: hasId && hasJson && clientOk,
+    hasSheetId: hasId,
+    hasServiceJson: hasJson,
+    clientOk: clientOk,
+    error: err
+  });
 });
 
 app.get('/api/health', function(req, res) {
