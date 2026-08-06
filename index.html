@@ -524,6 +524,30 @@
       }
     }
 
+
+    .win-btns { display: flex; gap: 4px; }
+    .win-btn {
+      width: 26px; height: 26px; border: none; border-radius: 8px;
+      background: #e8eef7; color: #1e3c72; font-size: 1rem; line-height: 1;
+      cursor: pointer; font-weight: 700; padding: 0;
+    }
+    .win-btn.light {
+      background: rgba(255,255,255,0.22); color: #fff;
+    }
+    .music-player.collapsed .mp-body { display: none; }
+    .zodiac-float.collapsed .zodiac-float-body { display: none; }
+    .fab-music, .fab-zodiac {
+      position: fixed; z-index: 91;
+      width: 44px; height: 44px; border-radius: 50%;
+      border: none; cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      font-size: 1.2rem;
+      background: #fff;
+    }
+    .fab-music { left: 16px; bottom: 20px; }
+    .fab-zodiac { right: 16px; bottom: 20px; }
+    .music-player .mp-title { display: flex; justify-content: space-between; align-items: center; }
+
   </style>
 </head>
 <body>
@@ -586,19 +610,26 @@
   <div class="music-player" id="musicPlayer">
     <div class="mp-title">
       <span>🎵 背景音樂</span>
+      <span class="win-btns">
+        <button type="button" class="win-btn" id="mpMin" title="縮小">－</button>
+        <button type="button" class="win-btn" id="mpClose" title="關閉">×</button>
+      </span>
     </div>
-    <div class="mp-track" id="mpTrackName">準備播放輕音樂…</div>
-    <div class="mp-controls">
-      <button type="button" class="mp-btn secondary" id="mpPrev" title="上一首">⏮</button>
-      <button type="button" class="mp-btn" id="mpPlay" title="播放／暫停">▶</button>
-      <button type="button" class="mp-btn secondary" id="mpNext" title="下一首（隨機）">⏭</button>
-    </div>
-    <div class="mp-vol-row">
-      <span>🔊</span>
-      <input type="range" id="mpVolume" min="0" max="100" value="35">
-      <span id="mpVolLabel">35</span>
+    <div class="mp-body" id="mpBody">
+      <div class="mp-track" id="mpTrackName">準備播放抒情音樂…</div>
+      <div class="mp-controls">
+        <button type="button" class="mp-btn secondary" id="mpPrev" title="上一首">⏮</button>
+        <button type="button" class="mp-btn" id="mpPlay" title="播放／暫停">▶</button>
+        <button type="button" class="mp-btn secondary" id="mpNext" title="下一首（隨機）">⏭</button>
+      </div>
+      <div class="mp-vol-row">
+        <span>🔊</span>
+        <input type="range" id="mpVolume" min="0" max="100" value="25">
+        <span id="mpVolLabel">25</span>
+      </div>
     </div>
   </div>
+  <button type="button" class="fab-music" id="mpFab" style="display:none;" title="開啟音樂">🎵</button>
   <audio id="bgAudio" preload="none"></audio>
 
   <div class="season-banner" id="seasonBanner" style="display:none;"></div>
@@ -606,13 +637,17 @@
   <div class="zodiac-float" id="zodiacFloat" style="display:none;">
     <div class="zodiac-float-head">
       <span>✨ 今日運勢</span>
-      <button type="button" id="zodiacToggle" title="收合">−</button>
+      <span class="win-btns">
+        <button type="button" class="win-btn light" id="zodiacToggle" title="縮小">－</button>
+        <button type="button" class="win-btn light" id="zodiacClose" title="關閉">×</button>
+      </span>
     </div>
     <div class="zodiac-float-body" id="zodiacFloatBody">
       <p class="zodiac-float-note">點選星座 → Google 搜尋今日運勢</p>
       <div class="zodiac-chips" id="zodiacChips"></div>
     </div>
   </div>
+  <button type="button" class="fab-zodiac" id="zodiacFab" style="display:none;" title="開啟運勢">✨</button>
 
   <div class="container locked" id="mainApp">
     <div class="header">
@@ -943,10 +978,27 @@
       }
       const toggle = document.getElementById('zodiacToggle');
       const floatEl = document.getElementById('zodiacFloat');
+      const zClose = document.getElementById('zodiacClose');
+      const zFab = document.getElementById('zodiacFab');
       if (toggle && floatEl) {
         toggle.addEventListener('click', function() {
           floatEl.classList.toggle('collapsed');
-          toggle.textContent = floatEl.classList.contains('collapsed') ? '+' : '−';
+          toggle.textContent = floatEl.classList.contains('collapsed') ? '□' : '－';
+        });
+      }
+      if (zClose && floatEl) {
+        zClose.addEventListener('click', function() {
+          floatEl.style.display = 'none';
+          floatEl.classList.remove('collapsed');
+          if (zFab) zFab.style.display = 'block';
+        });
+      }
+      if (zFab && floatEl) {
+        zFab.addEventListener('click', function() {
+          zFab.style.display = 'none';
+          floatEl.style.display = 'block';
+          floatEl.classList.remove('collapsed');
+          if (toggle) toggle.textContent = '－';
         });
       }
     })();
@@ -1265,17 +1317,17 @@
     (function() {
       // 免版稅示範曲（Pixabay 等，可自行換成你有授權的 mp3 網址）
       const playlist = [
-        { name: '輕音樂 1', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-        { name: '輕音樂 2', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
-        { name: '輕音樂 3', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
-        { name: '輕音樂 4', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
-        { name: '輕音樂 5', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
-        { name: '輕音樂 6', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
-        { name: '輕音樂 7', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' },
-        { name: '輕音樂 8', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
-        { name: '輕音樂 9', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' },
-        { name: '輕音樂 10', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3' }
-      ];
+        { name: '平靜視野', url: 'https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3' },
+        { name: '安靜時光', url: 'https://assets.mixkit.co/music/preview/mixkit-quiet-dyad-442.mp3' },
+        { name: '夢境漫遊', url: 'https://assets.mixkit.co/music/preview/mixkit-dreaming-big-31.mp3' },
+        { name: '林間漫步', url: 'https://assets.mixkit.co/music/preview/mixkit-spirit-in-the-woods-79.mp3' },
+        { name: '睡意輕柔', url: 'https://assets.mixkit.co/music/preview/mixkit-sleepy-cat-135.mp3' },
+        { name: '霧色夜晚', url: 'https://assets.mixkit.co/music/preview/mixkit-hazy-after-hours-7.mp3' },
+        { name: '美麗的夢', url: 'https://assets.mixkit.co/music/preview/mixkit-beautiful-dream-493.mp3' },
+        { name: '慢活節拍', url: 'https://assets.mixkit.co/music/preview/mixkit-relax-beats-119.mp3' },
+        { name: '晨光微亮', url: 'https://assets.mixkit.co/music/preview/mixkit-sun-and-his-daughter-580.mp3' },
+        { name: '溫柔陪伴', url: 'https://assets.mixkit.co/music/preview/mixkit-caterpillar-794.mp3' }
+      ]
 
       const audio = document.getElementById('bgAudio');
       const player = document.getElementById('musicPlayer');
@@ -1330,7 +1382,7 @@
         loadTrack(true);
       }
 
-      audio.volume = (parseInt(vol.value, 10) || 35) / 100;
+      audio.volume = (parseInt(vol.value, 10) || 25) / 100;
       vol.addEventListener('input', function() {
         const v = parseInt(vol.value, 10) || 0;
         audio.volume = v / 100;
@@ -1357,10 +1409,39 @@
       loadTrack(false);
 
       // 同意條款後顯示播放器並嘗試播放（瀏覽器可能仍需使用者再按一次）
+      const mpMin = document.getElementById('mpMin');
+      const mpClose = document.getElementById('mpClose');
+      const mpFab = document.getElementById('mpFab');
+      if (mpMin) {
+        mpMin.addEventListener('click', function() {
+          player.classList.toggle('collapsed');
+          mpMin.textContent = player.classList.contains('collapsed') ? '□' : '－';
+        });
+      }
+      if (mpClose) {
+        mpClose.addEventListener('click', function() {
+          audio.pause();
+          btnPlay.textContent = '▶';
+          player.classList.remove('show');
+          player.classList.remove('collapsed');
+          if (mpFab) mpFab.style.display = 'block';
+        });
+      }
+      if (mpFab) {
+        mpFab.addEventListener('click', function() {
+          mpFab.style.display = 'none';
+          player.classList.add('show');
+          player.classList.remove('collapsed');
+          if (mpMin) mpMin.textContent = '－';
+        });
+      }
+
       window.__startBgMusic = function() {
         player.classList.add('show');
+        if (mpFab) mpFab.style.display = 'none';
         if (started) return;
         started = true;
+        // 預設較小音量、抒情曲；若瀏覽器擋自動播放，使用者可按 ▶
         loadTrack(true);
       };
     })();
