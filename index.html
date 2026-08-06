@@ -444,6 +444,86 @@
       .zodiac-chips a { font-size: 0.72rem; padding: 6px 2px; }
     }
 
+
+    /* 背景音樂控制（無名小站風格） */
+    .music-player {
+      position: fixed;
+      left: 16px;
+      bottom: 20px;
+      z-index: 90;
+      background: rgba(255,255,255,0.95);
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.22);
+      padding: 12px 14px;
+      width: 220px;
+      border: 1px solid rgba(255,255,255,0.6);
+      backdrop-filter: blur(8px);
+      display: none;
+    }
+    .music-player.show { display: block; }
+    .music-player .mp-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #1e3c72;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .music-player .mp-track {
+      font-size: 0.75rem;
+      color: #666;
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-height: 1.2em;
+    }
+    .music-player .mp-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .music-player .mp-btn {
+      width: 36px; height: 36px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .music-player .mp-btn.secondary {
+      background: #e8eef7;
+      color: #1e3c72;
+      width: 32px; height: 32px;
+      font-size: 0.85rem;
+    }
+    .music-player input[type="range"] {
+      flex: 1;
+      margin: 0;
+      padding: 0;
+      accent-color: #2a5298;
+    }
+    .music-player .mp-vol-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: #555;
+    }
+    .music-player .mp-vol-row span { width: 28px; text-align: right; }
+    @media (max-width: 720px) {
+      .music-player {
+        left: 10px;
+        bottom: 12px;
+        width: 180px;
+        padding: 10px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -500,6 +580,26 @@
       </div>
     </div>
   </div>
+
+  
+  <!-- 背景輕音樂 -->
+  <div class="music-player" id="musicPlayer">
+    <div class="mp-title">
+      <span>🎵 背景音樂</span>
+    </div>
+    <div class="mp-track" id="mpTrackName">準備播放輕音樂…</div>
+    <div class="mp-controls">
+      <button type="button" class="mp-btn secondary" id="mpPrev" title="上一首">⏮</button>
+      <button type="button" class="mp-btn" id="mpPlay" title="播放／暫停">▶</button>
+      <button type="button" class="mp-btn secondary" id="mpNext" title="下一首（隨機）">⏭</button>
+    </div>
+    <div class="mp-vol-row">
+      <span>🔊</span>
+      <input type="range" id="mpVolume" min="0" max="100" value="35">
+      <span id="mpVolLabel">35</span>
+    </div>
+  </div>
+  <audio id="bgAudio" preload="none"></audio>
 
   <div class="season-banner" id="seasonBanner" style="display:none;"></div>
   <!-- 右側星座運勢小框 -->
@@ -1160,6 +1260,111 @@
     });
 
 
+
+    // ===== 背景輕音樂：10 首隨機、可調音量 =====
+    (function() {
+      // 免版稅示範曲（Pixabay 等，可自行換成你有授權的 mp3 網址）
+      const playlist = [
+        { name: '輕音樂 1', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+        { name: '輕音樂 2', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+        { name: '輕音樂 3', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+        { name: '輕音樂 4', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+        { name: '輕音樂 5', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
+        { name: '輕音樂 6', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
+        { name: '輕音樂 7', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' },
+        { name: '輕音樂 8', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
+        { name: '輕音樂 9', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' },
+        { name: '輕音樂 10', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3' }
+      ];
+
+      const audio = document.getElementById('bgAudio');
+      const player = document.getElementById('musicPlayer');
+      const nameEl = document.getElementById('mpTrackName');
+      const btnPlay = document.getElementById('mpPlay');
+      const btnNext = document.getElementById('mpNext');
+      const btnPrev = document.getElementById('mpPrev');
+      const vol = document.getElementById('mpVolume');
+      const volLabel = document.getElementById('mpVolLabel');
+      if (!audio || !player) return;
+
+      let order = [];
+      let idx = 0;
+      let started = false;
+
+      function shuffleOrder() {
+        order = playlist.map(function(_, i) { return i; });
+        for (let i = order.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const t = order[i]; order[i] = order[j]; order[j] = t;
+        }
+        idx = 0;
+      }
+
+      function currentTrack() {
+        return playlist[order[idx]] || playlist[0];
+      }
+
+      function loadTrack(autoplay) {
+        const t = currentTrack();
+        nameEl.textContent = t.name;
+        audio.src = t.url;
+        audio.load();
+        if (autoplay) {
+          audio.play().then(function() {
+            btnPlay.textContent = '⏸';
+          }).catch(function() {
+            btnPlay.textContent = '▶';
+            nameEl.textContent = t.name + '（請按播放）';
+          });
+        }
+      }
+
+      function nextTrack(autoplay) {
+        idx = (idx + 1) % order.length;
+        if (idx === 0) shuffleOrder();
+        loadTrack(autoplay !== false);
+      }
+
+      function prevTrack() {
+        idx = (idx - 1 + order.length) % order.length;
+        loadTrack(true);
+      }
+
+      audio.volume = (parseInt(vol.value, 10) || 35) / 100;
+      vol.addEventListener('input', function() {
+        const v = parseInt(vol.value, 10) || 0;
+        audio.volume = v / 100;
+        volLabel.textContent = String(v);
+      });
+
+      btnPlay.addEventListener('click', function() {
+        if (audio.paused) {
+          audio.play().then(function() { btnPlay.textContent = '⏸'; }).catch(function() {});
+        } else {
+          audio.pause();
+          btnPlay.textContent = '▶';
+        }
+      });
+      btnNext.addEventListener('click', function() { nextTrack(true); });
+      btnPrev.addEventListener('click', function() { prevTrack(); });
+      audio.addEventListener('ended', function() { nextTrack(true); });
+      audio.addEventListener('error', function() {
+        nameEl.textContent = '此曲無法播放，切換下一首…';
+        setTimeout(function() { nextTrack(true); }, 800);
+      });
+
+      shuffleOrder();
+      loadTrack(false);
+
+      // 同意條款後顯示播放器並嘗試播放（瀏覽器可能仍需使用者再按一次）
+      window.__startBgMusic = function() {
+        player.classList.add('show');
+        if (started) return;
+        started = true;
+        loadTrack(true);
+      };
+    })();
+
     // ===== 進站必讀 + 防機器人 =====
     (function() {
       const overlay = document.getElementById('termsOverlay');
@@ -1234,6 +1439,7 @@
         var zf = document.getElementById('zodiacFloat');
         if (sb) sb.style.display = 'block';
         if (zf) zf.style.display = 'block';
+        if (typeof window.__startBgMusic === 'function') window.__startBgMusic();
         try { sessionStorage.setItem('termsOk', '1'); } catch(e) {}
       });
 
