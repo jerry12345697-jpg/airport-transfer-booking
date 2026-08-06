@@ -15,7 +15,82 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
+
 const CSV_PATH = path.join(__dirname, 'bookings.csv');
+const CUSTOMERS_PATH = path.join(__dirname, 'customers.json');
+const ADMIN_KEY = process.env.ADMIN_KEY || 'xinxing2026';
+
+function normalizePhone(p) {
+  return String(p || '').replace(/\D/g, '');
+}
+
+function loadCustomers() {
+  try {
+    if (fs.existsSync(CUSTOMERS_PATH)) {
+      return JSON.parse(fs.readFileSync(CUSTOMERS_PATH, 'utf8'));
+    }
+  } catch (e) {}
+  return {};
+}
+
+function saveCustomers(data) {
+  fs.writeFileSync(CUSTOMERS_PATH, JSON.stringify(data, null, 2), 'utf8');
+}
+
+/** 以電話為主鍵；若無電話則用 LINE ID；再不行用姓名 */
+function upsertCustomer(booking) {
+  const customers = loadCustomers();
+  const phone = normalizePhone(booking.phone);
+  const lineId = String(booking.lineId || '').trim();
+  const name = String(booking.name || '').trim();
+
+  let key = '';
+  if (phone.length >= 8) key = 'p:' + phone;
+  else if (lineId) key = 'l:' + lineId.toLowerCase();
+  else if (name) key = 'n:' + name;
+  else key = 'u:' + booking.orderId;
+
+  // 嘗試合併：同電話或同 LINE 已存在
+  if (!customers[key]) {
+    const found = Object.keys(customers).find(function(k) {
+      const c = customers[k];
+      if (phone && c.phone && c.phone === phone) return true;
+      if (lineId && c.lineId && c.lineId.toLowerCase() === lineId.toLowerCase()) return true;
+      return false;
+    });
+    if (found) key = found;
+  }
+
+  const now = booking.createdAt || new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });
+  if (!customers[key]) {
+    customers[key] = {
+      key: key,
+      name: name,
+      phone: phone,
+      lineId: lineId,
+      bookingCount: 1,
+      firstBookingAt: now,
+      lastBookingAt: now,
+      lastOrderId: booking.orderId,
+      names: name ? [name] : [],
+      lineIds: lineId ? [lineId] : []
+    };
+  } else {
+    const c = customers[key];
+    c.bookingCount = (c.bookingCount || 0) + 1;
+    c.lastBookingAt = now;
+    c.lastOrderId = booking.orderId;
+    if (name) c.name = name;
+    if (phone) c.phone = phone;
+    if (lineId) c.lineId = lineId;
+    if (name && c.names && c.names.indexOf(name) < 0) c.names.push(name);
+    if (lineId && c.lineIds && c.lineIds.indexOf(lineId) < 0) c.lineIds.push(lineId);
+  }
+
+  saveCustomers(customers);
+  return customers[key];
+}
+
 
 function saveToCSV(booking) {
   const header = '訂單編號,建立時間,姓名,電話,LINE ID,服務類型,出發點,出發補充,停靠點1,停靠1補充,停靠點2,停靠2補充,目的地,目的補充,航廈,航班編號,日期,航班起飛時間,出發時間,人數,行李件數,行李尺寸,車型,安全座椅,舉牌接機,過年期間,備註,狀態\n';
@@ -71,6 +146,7 @@ function notifyLine(booking) {
   text += '────────\n';
   text += '姓名：' + booking.name + '\n';
   text += '電話：' + booking.phone + '\n';
+  if (booking.visitCount) text += '預約次數：第 ' + booking.visitCount + ' 次' + (booking.visitCount > 1 ? '（回流客）' : '') + '\n';
   text += 'LINE：' + (booking.lineId || '無') + '\n';
   text += '服務：' + booking.serviceType + '\n';
   text += '日期：' + booking.date + (booking.cny ? '（過年期間）' : '') + '\n';
@@ -163,11 +239,15 @@ app.post('/api/booking', function(req, res) {
     };
 
     saveToCSV(booking);
+    const customer = upsertCustomer(booking);
+    booking.visitCount = customer.bookingCount;
     notifyLine(booking);
 
     res.json({
       success: true,
       orderId: orderId,
+      visitCount: customer.bookingCount,
+      isReturning: customer.bookingCount > 1,
       message: '已送出，專人將盡快報價'
     });
   } catch (err) {
@@ -244,6 +324,19 @@ app.get('/api/horoscope', function(req, res) {
   });
 });
 
+
+
+// 後台：客戶預約次數（發放優惠依據）
+app.get('/api/admin/customers', function(req, res) {
+  const key = req.query.key || req.headers['x-admin-key'];
+  if (key !== ADMIN_KEY) {
+    return res.status(401).json({ error: '未授權' });
+  }
+  const customers = loadCustomers();
+  const list = Object.keys(customers).map(function(k) { return customers[k]; });
+  list.sort(function(a, b) { return (b.bookingCount || 0) - (a.bookingCount || 0); });
+  res.json({ ok: true, total: list.length, customers: list });
+});
 
 app.get('/api/health', function(req, res) {
   res.json({ status: 'ok', time: new Date().toISOString() });

@@ -1081,8 +1081,10 @@
       };
 
       let orderId = 'AT' + Date.now().toString().slice(-8);
+      let visitCount = 0;
+      let isReturning = false;
 
-      // 嘗試存檔（失敗也不影響複製流程）
+      // 嘗試存檔並累計客戶預約次數
       try {
         const res = await fetch('/api/booking', {
           method: 'POST',
@@ -1091,11 +1093,26 @@
         });
         const result = await res.json();
         if (result.success && result.orderId) orderId = result.orderId;
+        if (result.visitCount) visitCount = result.visitCount;
+        if (result.isReturning) isReturning = true;
       } catch (err) {
         console.log('save optional fail', err);
       }
 
-      const plain = buildPlainSummary(orderId);
+      let plain = buildPlainSummary(orderId);
+      if (visitCount > 0) {
+        plain = plain.replace(
+          '────────\n',
+          '────────\n預約次數：第 ' + visitCount + ' 次' + (isReturning ? '（回流客戶）' : '') + '\n'
+        );
+        // 若格式不同再補在開頭附近
+        if (plain.indexOf('預約次數') < 0) {
+          plain = plain.replace(
+            '訂單編號：' + orderId,
+            '訂單編號：' + orderId + '\n預約次數：第 ' + visitCount + ' 次' + (isReturning ? '（回流客戶）' : '')
+          );
+        }
+      }
       document.getElementById('finalSummary').textContent = plain;
       document.getElementById('orderId').textContent = orderId;
       document.getElementById('confirmModal').classList.add('show');
