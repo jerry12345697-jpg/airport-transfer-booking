@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>機場接送｜包車旅遊｜訂製預約｜心星接送</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18372863823"></script>
   <script>
@@ -45,14 +48,40 @@
     }
     .season-banner {
       max-width: 640px;
-      margin: 0 auto 12px;
+      margin: 8px auto 16px;
       text-align: center;
-      color: #fff;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
-      font-size: 0.92rem;
-      line-height: 1.5;
+      color: #fffef7;
+      padding: 18px 20px 16px;
+      line-height: 1.6;
+      position: relative;
+      /* 與背景融合的詩意字卡 */
+      background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.28) 100%);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+      backdrop-filter: blur(2px);
     }
-    .season-banner strong { font-size: 1.05rem; }
+    .season-banner .season-title {
+      display: block;
+      font-family: "Ma Shan Zheng", "Zhi Mang Xing", "楷體", "楷体", serif;
+      font-size: clamp(1.75rem, 5vw, 2.35rem);
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-shadow:
+        0 2px 8px rgba(0,0,0,0.65),
+        0 0 24px rgba(0,0,0,0.35);
+      margin-bottom: 6px;
+      line-height: 1.35;
+    }
+    .season-banner .season-desc {
+      display: block;
+      font-family: "Zhi Mang Xing", "Ma Shan Zheng", "楷體", "楷体", serif;
+      font-size: clamp(1rem, 3.2vw, 1.25rem);
+      letter-spacing: 0.08em;
+      opacity: 0.95;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.7);
+      font-weight: 400;
+    }
     .zodiac-card {
       max-width: 640px;
       margin: 0 auto 14px;
@@ -795,7 +824,7 @@
 
       const banner = document.getElementById('seasonBanner');
       if (banner) {
-        banner.innerHTML = '<strong>' + theme.name + '</strong><br>' + theme.desc;
+        banner.innerHTML = '<span class="season-title">' + theme.name + '</span><span class="season-desc">' + theme.desc + '</span>';
       }
 
       // 右側運勢小框：連到 Google 搜尋「今日XX座運勢」
