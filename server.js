@@ -77,7 +77,15 @@ async function appendBookingToSheet(booking) {
 
 const CSV_PATH = path.join(__dirname, 'bookings.csv');
 const CUSTOMERS_PATH = path.join(__dirname, 'customers.json');
-const ADMIN_KEY = process.env.ADMIN_KEY || 'xinxing2026';
+const ADMIN_KEY = String(process.env.ADMIN_KEY || 'xinxing2026').trim();
+
+function getAdminKeyFromReq(req) {
+  const q = req.query && req.query.key;
+  const h = req.headers && req.headers['x-admin-key'];
+  const b = req.body && req.body.key;
+  return String(q || h || b || '').trim();
+}
+
 
 function normalizePhone(p) {
   return String(p || '').replace(/\D/g, '');
@@ -391,7 +399,7 @@ app.get('/api/horoscope', function(req, res) {
 // 後台：客戶預約次數（發放優惠依據）
 
 app.delete('/api/admin/customers', function(req, res) {
-  const key = req.query.key || req.headers['x-admin-key'] || (req.body && req.body.key);
+  const key = getAdminKeyFromReq(req);
   if (key !== ADMIN_KEY) {
     return res.status(401).json({ error: '未授權' });
   }
@@ -409,8 +417,17 @@ app.delete('/api/admin/customers', function(req, res) {
   res.json({ ok: true, removed: removed, total: Object.keys(customers).length });
 });
 
+app.get('/api/admin/ping', function(req, res) {
+  const key = getAdminKeyFromReq(req);
+  res.json({
+    ok: key === ADMIN_KEY,
+    inputLen: key.length,
+    expectedLen: ADMIN_KEY.length
+  });
+});
+
 app.get('/api/admin/customers', function(req, res) {
-  const key = req.query.key || req.headers['x-admin-key'];
+  const key = getAdminKeyFromReq(req);
   if (key !== ADMIN_KEY) {
     return res.status(401).json({ error: '未授權' });
   }
