@@ -402,9 +402,27 @@
 
   <div class="season-banner" id="seasonBanner" style="display:none;"></div>
   <div class="zodiac-card" id="zodiacCard" style="display:none;">
-    <h3>✨ 今日星座小語</h3>
-    <div class="zodiac-today" id="zodiacToday"></div>
-    <div class="zodiac-list" id="zodiacList"></div>
+    <h3>✨ 今日星座運勢</h3>
+    <p style="font-size:0.82rem;color:#666;margin-bottom:8px;">資料來源：科技紫微網（每日更新）・請選擇您的星座</p>
+    <select id="zodiacSelect" style="width:100%;margin-bottom:10px;padding:10px;border-radius:8px;border:1.5px solid #d0d7de;font-size:1rem;">
+      <option value="">— 請選擇星座 —</option>
+      <option value="0">牡羊座（03/21–04/19）</option>
+      <option value="1">金牛座（04/20–05/20）</option>
+      <option value="2">雙子座（05/21–06/21）</option>
+      <option value="3">巨蟹座（06/22–07/22）</option>
+      <option value="4">獅子座（07/23–08/22）</option>
+      <option value="5">處女座（08/23–09/22）</option>
+      <option value="6">天秤座（09/23–10/23）</option>
+      <option value="7">天蠍座（10/24–11/22）</option>
+      <option value="8">射手座（11/23–12/21）</option>
+      <option value="9">魔羯座（12/22–01/19）</option>
+      <option value="10">水瓶座（01/20–02/18）</option>
+      <option value="11">雙魚座（02/19–03/20）</option>
+    </select>
+    <div class="zodiac-today" id="zodiacToday" style="min-height:2.5em;">選擇星座後顯示今日運勢摘要</div>
+    <p style="margin-top:8px;font-size:0.8rem;">
+      <a id="zodiacMore" href="https://astro.click108.com.tw/index.php" target="_blank" rel="noopener" style="color:#2a5298;">查看完整今日運勢（科技紫微網）→</a>
+    </p>
   </div>
   <div class="container locked" id="mainApp">
     <div class="header">
@@ -689,59 +707,38 @@
         }
       ];
 
-      const zodiacTips = [
-        { sign: '牡羊座', tip: '行動力高，適合敲定行程與出發時間。' },
-        { sign: '金牛座', tip: '重實用，先確認行李與車型最安心。' },
-        { sign: '雙子座', tip: '資訊多，記得把航班與會合點寫清楚。' },
-        { sign: '巨蟹座', tip: '顧家溫暖，接送親友時多留一點彈性。' },
-        { sign: '獅子座', tip: '大氣自信，今日適合安排舒適的車程。' },
-        { sign: '處女座', tip: '細節控，再核對一次時間與地址更好。' },
-        { sign: '天秤座', tip: '追求平衡，提早預約可少些臨時壓力。' },
-        { sign: '天蠍座', tip: '專注深沉，重要行程交給可靠接送。' },
-        { sign: '射手座', tip: '愛自由，長途接送也能當成小旅行。' },
-        { sign: '摩羯座', tip: '務實穩健，先報價再出發最踏實。' },
-        { sign: '水瓶座', tip: '想法獨特，試試線上預約更有效率。' },
-        { sign: '雙魚座', tip: '感性柔軟，路上放鬆欣賞沿途風景。' }
-      ];
-
-      const now = new Date();
-      const m = now.getMonth(); // 0-11
-      const theme = monthThemes[m];
-      const day = now.getDate();
-
-      // 背景：先漸層，圖載入成功再疊圖
-      document.body.style.background = theme.gradient;
-      const img = new Image();
-      img.onload = function() {
-        document.body.style.backgroundImage =
-          'linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.4)), url(\'' + theme.image + '\')';
-        document.body.style.backgroundSize = 'cover';
-        document.body.style.backgroundPosition = 'center';
-        document.body.style.backgroundAttachment = 'fixed';
-        document.body.classList.add('theme-ready');
-      };
-      img.onerror = function() {
-        document.body.style.background = theme.gradient;
-      };
-      img.src = theme.image;
-
-      const banner = document.getElementById('seasonBanner');
-      if (banner) {
-        banner.innerHTML = '<strong>' + theme.name + '</strong><br>' + theme.desc;
-      }
-
-      // 每日小語：依「今天日期」輪換一句總提示 + 十二星座
-      const dailyIdx = (now.getFullYear() * 1000 + (m + 1) * 50 + day) % zodiacTips.length;
-      const todayTip = zodiacTips[dailyIdx];
+      const signNames = ['牡羊座','金牛座','雙子座','巨蟹座','獅子座','處女座','天秤座','天蠍座','射手座','魔羯座','水瓶座','雙魚座'];
       const zToday = document.getElementById('zodiacToday');
-      if (zToday) {
-        zToday.textContent = '今日亮點「' + todayTip.sign + '」：' + todayTip.tip;
+      const zSelect = document.getElementById('zodiacSelect');
+      const zMore = document.getElementById('zodiacMore');
+
+      function loadHoroscope(i) {
+        if (zToday) zToday.textContent = '讀取今日運勢中…';
+        if (zMore) zMore.href = 'https://astro.click108.com.tw/daily_' + i + '.php?iAstro=' + i;
+        fetch('/api/horoscope?i=' + i)
+          .then(function(r){ return r.json(); })
+          .then(function(data) {
+            if (data && data.ok && data.summary) {
+              zToday.innerHTML = '<strong>' + (signNames[i] || '') + '・今日運勢</strong><br>' + data.summary;
+            } else {
+              zToday.innerHTML = '<strong>' + (signNames[i] || '') + '</strong>：暫無法載入摘要，請點下方連結查看完整今日運勢。';
+            }
+          })
+          .catch(function() {
+            zToday.innerHTML = '<strong>' + (signNames[i] || '') + '</strong>：請點下方「查看完整今日運勢」開啟科技紫微網。';
+          });
       }
-      const zList = document.getElementById('zodiacList');
-      if (zList) {
-        zList.innerHTML = zodiacTips.map(function(z) {
-          return '<span><strong>' + z.sign + '</strong> ' + z.tip + '</span>';
-        }).join('');
+
+      if (zSelect) {
+        zSelect.addEventListener('change', function() {
+          const v = zSelect.value;
+          if (v === '') {
+            if (zToday) zToday.textContent = '選擇星座後顯示今日運勢摘要';
+            if (zMore) zMore.href = 'https://astro.click108.com.tw/index.php';
+            return;
+          }
+          loadHoroscope(v);
+        });
       }
     })();
 

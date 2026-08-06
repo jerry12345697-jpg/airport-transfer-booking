@@ -176,6 +176,75 @@ app.post('/api/booking', function(req, res) {
   }
 });
 
+
+// 今日星座運勢（轉址科技紫微網 daily_N.php）
+const SIGN_NAMES = ['牡羊座','金牛座','雙子座','巨蟹座','獅子座','處女座','天秤座','天蠍座','射手座','魔羯座','水瓶座','雙魚座'];
+
+app.get('/api/horoscope', function(req, res) {
+  let i = parseInt(req.query.i, 10);
+  if (isNaN(i) || i < 0 || i > 11) {
+    return res.status(400).json({ ok: false, error: 'invalid sign' });
+  }
+  const url = 'https://astro.click108.com.tw/daily_' + i + '.php?iAstro=' + i;
+  const lib = url.startsWith('https') ? https : require('http');
+  const request = lib.get(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (compatible; XingXingTransfer/1.0)',
+      'Accept': 'text/html,application/xhtml+xml',
+      'Accept-Language': 'zh-TW,zh;q=0.9'
+    },
+    timeout: 8000
+  }, function(r) {
+    let raw = '';
+    r.setEncoding('utf8');
+    r.on('data', function(c) { raw += c; if (raw.length > 500000) r.destroy(); });
+    r.on('end', function() {
+      try {
+        let text = raw
+          .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+          .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+          .replace(/<[^>]+>/g, ' ')
+          .replace(/&nbsp;/g, ' ')
+          .replace(/&amp;/g, '&')
+          .replace(/\s+/g, ' ');
+
+        let summary = '';
+        // 抓「整體運勢」一段
+        const m1 = text.match(/整體運勢[★☆\*]{0,10}[：:]\s*([^。]{10,120}。)/);
+        if (m1) summary = m1[0].trim();
+        if (!summary) {
+          const m2 = text.match(/今日[^。]{0,8}解析[^。]{0,20}整體運勢[★☆]{0,10}[：:]?\s*([^。]{15,150}。)/);
+          if (m2) summary = m2[0].replace(/\s+/g, ' ').trim().slice(0, 200);
+        }
+        if (!summary) {
+          const m3 = text.match(/整體運勢[\s\S]{0,30}?([★☆]{1,5})[：:]?\s*([^★]{20,160})/);
+          if (m3) summary = ('整體運勢' + m3[1] + '：' + m3[2]).replace(/\s+/g, ' ').trim().slice(0, 200);
+        }
+        if (!summary) {
+          summary = '';
+        }
+        res.json({
+          ok: !!summary,
+          sign: SIGN_NAMES[i],
+          i: i,
+          summary: summary || null,
+          source: url
+        });
+      } catch (e) {
+        res.json({ ok: false, error: 'parse', source: url });
+      }
+    });
+  });
+  request.on('error', function() {
+    res.json({ ok: false, error: 'fetch' });
+  });
+  request.on('timeout', function() {
+    request.destroy();
+    res.json({ ok: false, error: 'timeout' });
+  });
+});
+
+
 app.get('/api/health', function(req, res) {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
