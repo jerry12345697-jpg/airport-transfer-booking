@@ -503,6 +503,54 @@
       .zodiac-fortunes { max-height: 220px; font-size: 0.74rem; }
     }
 
+
+    .visit-counter {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 80;
+      background: rgba(255,255,255,0.92);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      color: #444;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.7);
+      backdrop-filter: blur(6px);
+      display: none;
+    }
+    .visit-counter .vc-num {
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin: 0 2px;
+      background: linear-gradient(90deg, #f59e0b, #ec4899, #8b5cf6, #3b82f6, #10b981);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: vcShine 3s linear infinite;
+    }
+    @keyframes vcShine {
+      to { background-position: 200% center; }
+    }
+    .visit-top {
+      text-align: center;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.95);
+      margin-top: 8px;
+      letter-spacing: 0.02em;
+    }
+    .visit-top .vc-num {
+      font-weight: 800;
+      font-size: 1.15rem;
+      background: linear-gradient(90deg, #fde68a, #f9a8d4, #c4b5fd, #93c5fd, #6ee7b7);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: vcShine 3s linear infinite;
+    }
+
   </style>
 </head>
 <body>
@@ -560,6 +608,7 @@
     </div>
   </div>
 <div class="season-banner" id="seasonBanner" style="display:none;"></div>
+  <div class="visit-counter" id="visitCounter">已到站 <span class="vc-num" id="visitNum">—</span> 次瀏覽</div>
   <!-- 右側星座運勢小框 -->
   <div class="zodiac-float" id="zodiacFloat" style="display:none;">
     <div class="zodiac-float-head">
@@ -579,6 +628,7 @@
   <div class="container locked" id="mainApp">
     <div class="header">
       <h1>💝心星⭐️機場接送</h1>
+      <p class="visit-top" id="visitTop" style="display:none;">本站已服務瀏覽 <span class="vc-num" id="visitNumTop">—</span> 次</p>
       <p>填寫需求 → 確認摘要 → 送出後由專人報價回覆</p>
     </div>
 
@@ -781,6 +831,26 @@
   </div>
 
   <script>
+
+
+    // 瀏覽次數
+    (function() {
+      function apply(n) {
+        var a = document.getElementById('visitNum');
+        var b = document.getElementById('visitNumTop');
+        var c = document.getElementById('visitCounter');
+        var t = document.getElementById('visitTop');
+        var s = String(n);
+        if (a) a.textContent = s;
+        if (b) b.textContent = s;
+        if (c) c.style.display = 'block';
+        if (t) t.style.display = 'block';
+      }
+      fetch('/api/views')
+        .then(function(r){ return r.json(); })
+        .then(function(d){ if (d && d.total != null) apply(d.total); })
+        .catch(function(){});
+    })();
 
     // ===== 每月台灣季節／景點背景 + 星座每日小語 =====
     (function() {

@@ -327,6 +327,26 @@ app.get('/api/horoscope', function(req, res) {
 
 
 // 後台：客戶預約次數（發放優惠依據）
+
+app.delete('/api/admin/customers', function(req, res) {
+  const key = req.query.key || req.headers['x-admin-key'] || (req.body && req.body.key);
+  if (key !== ADMIN_KEY) {
+    return res.status(401).json({ error: '未授權' });
+  }
+  const customerKey = (req.query.customerKey || (req.body && req.body.customerKey) || '').trim();
+  if (!customerKey) {
+    return res.status(400).json({ error: '缺少 customerKey' });
+  }
+  const customers = loadCustomers();
+  if (!customers[customerKey]) {
+    return res.status(404).json({ error: '找不到此客戶' });
+  }
+  const removed = customers[customerKey];
+  delete customers[customerKey];
+  saveCustomers(customers);
+  res.json({ ok: true, removed: removed, total: Object.keys(customers).length });
+});
+
 app.get('/api/admin/customers', function(req, res) {
   const key = req.query.key || req.headers['x-admin-key'];
   if (key !== ADMIN_KEY) {
@@ -336,6 +356,39 @@ app.get('/api/admin/customers', function(req, res) {
   const list = Object.keys(customers).map(function(k) { return customers[k]; });
   list.sort(function(a, b) { return (b.bookingCount || 0) - (a.bookingCount || 0); });
   res.json({ ok: true, total: list.length, customers: list });
+});
+
+
+const VIEWS_PATH = path.join(__dirname, 'views.json');
+
+function loadViews() {
+  try {
+    if (fs.existsSync(VIEWS_PATH)) {
+      return JSON.parse(fs.readFileSync(VIEWS_PATH, 'utf8'));
+    }
+  } catch (e) {}
+  return { total: 0 };
+}
+
+function bumpView() {
+  const data = loadViews();
+  data.total = (data.total || 0) + 1;
+  data.updatedAt = new Date().toISOString();
+  try {
+    fs.writeFileSync(VIEWS_PATH, JSON.stringify(data), 'utf8');
+  } catch (e) {}
+  return data.total;
+}
+
+app.get('/api/views', function(req, res) {
+  // 僅計數，不記 IP 細節（簡易到站次數）
+  const total = bumpView();
+  res.json({ ok: true, total: total });
+});
+
+app.get('/api/views/count', function(req, res) {
+  const data = loadViews();
+  res.json({ ok: true, total: data.total || 0 });
 });
 
 app.get('/api/health', function(req, res) {
