@@ -343,6 +343,78 @@
     .hp-field { position: absolute; left: -9999px; opacity: 0; height: 0; overflow: hidden; }
     .container.locked { display: none; }
 
+
+    .zodiac-float {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      width: 200px;
+      z-index: 90;
+      background: rgba(255,255,255,0.95);
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.22);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.6);
+      backdrop-filter: blur(8px);
+    }
+    .zodiac-float-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .zodiac-float-head button {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: #fff;
+      width: 26px; height: 26px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+    }
+    .zodiac-float-body { padding: 10px 10px 12px; }
+    .zodiac-float-note {
+      font-size: 0.72rem;
+      color: #888;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .zodiac-chips {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .zodiac-chips a {
+      display: block;
+      text-align: center;
+      padding: 7px 4px;
+      font-size: 0.78rem;
+      text-decoration: none;
+      color: #1e3c72;
+      background: #f0f5ff;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .zodiac-chips a:hover {
+      background: #dbe7ff;
+      transform: translateY(-1px);
+    }
+    .zodiac-float.collapsed .zodiac-float-body { display: none; }
+    @media (max-width: 720px) {
+      .zodiac-float {
+        right: 10px;
+        bottom: 12px;
+        width: 168px;
+      }
+      .zodiac-chips a { font-size: 0.72rem; padding: 6px 2px; }
+    }
+
   </style>
 </head>
 <body>
@@ -401,29 +473,18 @@
   </div>
 
   <div class="season-banner" id="seasonBanner" style="display:none;"></div>
-  <div class="zodiac-card" id="zodiacCard" style="display:none;">
-    <h3>✨ 今日星座運勢</h3>
-    <p style="font-size:0.82rem;color:#666;margin-bottom:8px;">資料來源：科技紫微網（每日更新）・請選擇您的星座</p>
-    <select id="zodiacSelect" style="width:100%;margin-bottom:10px;padding:10px;border-radius:8px;border:1.5px solid #d0d7de;font-size:1rem;">
-      <option value="">— 請選擇星座 —</option>
-      <option value="0">牡羊座（03/21–04/19）</option>
-      <option value="1">金牛座（04/20–05/20）</option>
-      <option value="2">雙子座（05/21–06/21）</option>
-      <option value="3">巨蟹座（06/22–07/22）</option>
-      <option value="4">獅子座（07/23–08/22）</option>
-      <option value="5">處女座（08/23–09/22）</option>
-      <option value="6">天秤座（09/23–10/23）</option>
-      <option value="7">天蠍座（10/24–11/22）</option>
-      <option value="8">射手座（11/23–12/21）</option>
-      <option value="9">魔羯座（12/22–01/19）</option>
-      <option value="10">水瓶座（01/20–02/18）</option>
-      <option value="11">雙魚座（02/19–03/20）</option>
-    </select>
-    <div class="zodiac-today" id="zodiacToday" style="min-height:2.5em;">選擇星座後顯示今日運勢摘要</div>
-    <p style="margin-top:8px;font-size:0.8rem;">
-      <a id="zodiacMore" href="https://astro.click108.com.tw/index.php" target="_blank" rel="noopener" style="color:#2a5298;">查看完整今日運勢（科技紫微網）→</a>
-    </p>
+  <!-- 右側星座運勢小框 -->
+  <div class="zodiac-float" id="zodiacFloat" style="display:none;">
+    <div class="zodiac-float-head">
+      <span>✨ 今日運勢</span>
+      <button type="button" id="zodiacToggle" title="收合">−</button>
+    </div>
+    <div class="zodiac-float-body" id="zodiacFloatBody">
+      <p class="zodiac-float-note">點選星座 → Google 搜尋今日運勢</p>
+      <div class="zodiac-chips" id="zodiacChips"></div>
+    </div>
   </div>
+
   <div class="container locked" id="mainApp">
     <div class="header">
       <h1>💝心星⭐️機場接送</h1>
@@ -703,41 +764,60 @@
           name: '十二月・耶誕與暖冬',
           desc: '城市燈飾、溫泉與跨年氣氛，為一年畫下溫柔句點',
           gradient: 'linear-gradient(160deg, #1b1464 0%, #6c3483 50%, #f5b7b1 100%)',
-          image: 'https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=1600&q=80'
+          image: 'https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=1600&q=80'
         }
       ];
 
-      const signNames = ['牡羊座','金牛座','雙子座','巨蟹座','獅子座','處女座','天秤座','天蠍座','射手座','魔羯座','水瓶座','雙魚座'];
-      const zToday = document.getElementById('zodiacToday');
-      const zSelect = document.getElementById('zodiacSelect');
-      const zMore = document.getElementById('zodiacMore');
+      // 套用本月背景（含十二月）
+      const now = new Date();
+      const m = now.getMonth();
+      const theme = monthThemes[m] || monthThemes[0];
 
-      function loadHoroscope(i) {
-        if (zToday) zToday.textContent = '讀取今日運勢中…';
-        if (zMore) zMore.href = 'https://astro.click108.com.tw/daily_' + i + '.php?iAstro=' + i;
-        fetch('/api/horoscope?i=' + i)
-          .then(function(r){ return r.json(); })
-          .then(function(data) {
-            if (data && data.ok && data.summary) {
-              zToday.innerHTML = '<strong>' + (signNames[i] || '') + '・今日運勢</strong><br>' + data.summary;
-            } else {
-              zToday.innerHTML = '<strong>' + (signNames[i] || '') + '</strong>：暫無法載入摘要，請點下方連結查看完整今日運勢。';
-            }
-          })
-          .catch(function() {
-            zToday.innerHTML = '<strong>' + (signNames[i] || '') + '</strong>：請點下方「查看完整今日運勢」開啟科技紫微網。';
-          });
+      document.body.style.background = theme.gradient;
+      document.body.style.backgroundAttachment = 'fixed';
+
+      const img = new Image();
+      img.onload = function() {
+        document.body.style.backgroundImage =
+          'linear-gradient(rgba(15,20,40,0.42), rgba(15,20,40,0.5)), url(\'' + theme.image + '\')';
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center center';
+        document.body.style.backgroundRepeat = 'no-repeat';
+        document.body.style.backgroundAttachment = 'fixed';
+        document.body.classList.add('theme-ready');
+      };
+      img.onerror = function() {
+        // 圖失敗仍保留漸層（十二月深紫粉）
+        document.body.style.background = theme.gradient;
+        document.body.style.backgroundAttachment = 'fixed';
+      };
+      img.src = theme.image;
+
+      const banner = document.getElementById('seasonBanner');
+      if (banner) {
+        banner.innerHTML = '<strong>' + theme.name + '</strong><br>' + theme.desc;
       }
 
-      if (zSelect) {
-        zSelect.addEventListener('change', function() {
-          const v = zSelect.value;
-          if (v === '') {
-            if (zToday) zToday.textContent = '選擇星座後顯示今日運勢摘要';
-            if (zMore) zMore.href = 'https://astro.click108.com.tw/index.php';
-            return;
-          }
-          loadHoroscope(v);
+      // 右側運勢小框：連到 Google 搜尋「今日XX座運勢」
+      const signs = ['牡羊座','金牛座','雙子座','巨蟹座','獅子座','處女座','天秤座','天蠍座','射手座','魔羯座','水瓶座','雙魚座'];
+      const chips = document.getElementById('zodiacChips');
+      if (chips) {
+        const y = now.getFullYear();
+        const mo = now.getMonth() + 1;
+        const d = now.getDate();
+        const dateStr = y + '/' + mo + '/' + d;
+        chips.innerHTML = signs.map(function(s) {
+          const q = encodeURIComponent(dateStr + ' ' + s + ' 今日運勢');
+          const url = 'https://www.google.com/search?q=' + q + '&hl=zh-TW';
+          return '<a href="' + url + '" target="_blank" rel="noopener">' + s + '</a>';
+        }).join('');
+      }
+      const toggle = document.getElementById('zodiacToggle');
+      const floatEl = document.getElementById('zodiacFloat');
+      if (toggle && floatEl) {
+        toggle.addEventListener('click', function() {
+          floatEl.classList.toggle('collapsed');
+          toggle.textContent = floatEl.classList.contains('collapsed') ? '+' : '−';
         });
       }
     })();
@@ -1105,9 +1185,9 @@
         overlay.classList.add('hidden');
         main.classList.remove('locked');
         var sb = document.getElementById('seasonBanner');
-        var zc = document.getElementById('zodiacCard');
+        var zf = document.getElementById('zodiacFloat');
         if (sb) sb.style.display = 'block';
-        if (zc) zc.style.display = 'block';
+        if (zf) zf.style.display = 'block';
         try { sessionStorage.setItem('termsOk', '1'); } catch(e) {}
       });
 
