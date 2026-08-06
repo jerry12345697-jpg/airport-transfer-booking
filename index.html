@@ -443,78 +443,6 @@
       }
       .zodiac-chips a { font-size: 0.72rem; padding: 6px 2px; }
     }
-
-
-    /* 背景音樂控制（無名小站風格） */
-    .music-player {
-      position: fixed;
-      left: 16px;
-      bottom: 20px;
-      z-index: 90;
-      background: rgba(255,255,255,0.95);
-      border-radius: 16px;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.22);
-      padding: 12px 14px;
-      width: 220px;
-      border: 1px solid rgba(255,255,255,0.6);
-      backdrop-filter: blur(8px);
-      display: none;
-    }
-    .music-player.show { display: block; }
-    .music-player .mp-title {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #1e3c72;
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .music-player .mp-track {
-      font-size: 0.75rem;
-      color: #666;
-      margin-bottom: 8px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      min-height: 1.2em;
-    }
-    .music-player .mp-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .music-player .mp-btn {
-      width: 36px; height: 36px;
-      border: none;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: #fff;
-      font-size: 1rem;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .music-player .mp-btn.secondary {
-      background: #e8eef7;
-      color: #1e3c72;
-      width: 32px; height: 32px;
-      font-size: 0.85rem;
-    }
-    .music-player input[type="range"] {
-      flex: 1;
-      margin: 0;
-      padding: 0;
-      accent-color: #2a5298;
-    }
-    .music-player .mp-vol-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.75rem;
-      color: #555;
-    }
-    .music-player .mp-vol-row span { width: 28px; text-align: right; }
     @media (max-width: 720px) {
       .music-player {
         left: 10px;
@@ -547,6 +475,33 @@
     .fab-music { left: 16px; bottom: 20px; }
     .fab-zodiac { right: 16px; bottom: 20px; }
     .music-player .mp-title { display: flex; justify-content: space-between; align-items: center; }
+
+
+    .zodiac-fortunes {
+      max-height: 280px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: #333;
+    }
+    .zodiac-fortunes .zf-item {
+      padding: 8px 6px;
+      border-bottom: 1px solid #eef2f7;
+    }
+    .zodiac-fortunes .zf-item:last-child { border-bottom: none; }
+    .zodiac-fortunes .zf-sign {
+      font-weight: 700;
+      color: #1e3c72;
+      margin-bottom: 2px;
+    }
+    .zodiac-float {
+      width: 230px;
+    }
+    @media (max-width: 720px) {
+      .zodiac-float { width: 200px; }
+      .zodiac-fortunes { max-height: 220px; font-size: 0.74rem; }
+    }
 
   </style>
 </head>
@@ -604,35 +559,7 @@
       </div>
     </div>
   </div>
-
-  
-  <!-- 背景輕音樂 -->
-  <div class="music-player" id="musicPlayer">
-    <div class="mp-title">
-      <span>🎵 背景音樂</span>
-      <span class="win-btns">
-        <button type="button" class="win-btn" id="mpMin" title="縮小">－</button>
-        <button type="button" class="win-btn" id="mpClose" title="關閉">×</button>
-      </span>
-    </div>
-    <div class="mp-body" id="mpBody">
-      <div class="mp-track" id="mpTrackName">準備播放抒情音樂…</div>
-      <div class="mp-controls">
-        <button type="button" class="mp-btn secondary" id="mpPrev" title="上一首">⏮</button>
-        <button type="button" class="mp-btn" id="mpPlay" title="播放／暫停">▶</button>
-        <button type="button" class="mp-btn secondary" id="mpNext" title="下一首（隨機）">⏭</button>
-      </div>
-      <div class="mp-vol-row">
-        <span>🔊</span>
-        <input type="range" id="mpVolume" min="0" max="100" value="25">
-        <span id="mpVolLabel">25</span>
-      </div>
-    </div>
-  </div>
-  <button type="button" class="fab-music" id="mpFab" style="display:none;" title="開啟音樂">🎵</button>
-  <audio id="bgAudio" preload="none"></audio>
-
-  <div class="season-banner" id="seasonBanner" style="display:none;"></div>
+<div class="season-banner" id="seasonBanner" style="display:none;"></div>
   <!-- 右側星座運勢小框 -->
   <div class="zodiac-float" id="zodiacFloat" style="display:none;">
     <div class="zodiac-float-head">
@@ -643,8 +570,8 @@
       </span>
     </div>
     <div class="zodiac-float-body" id="zodiacFloatBody">
-      <p class="zodiac-float-note">點選星座 → Google 搜尋今日運勢</p>
-      <div class="zodiac-chips" id="zodiacChips"></div>
+      <p class="zodiac-float-note" id="zodiacDateNote">今日十二星座運勢（可捲動）</p>
+      <div class="zodiac-fortunes" id="zodiacFortunes"></div>
     </div>
   </div>
   <button type="button" class="fab-zodiac" id="zodiacFab" style="display:none;" title="開啟運勢">✨</button>
@@ -962,18 +889,36 @@
         banner.innerHTML = '<span class="season-title">' + theme.name + '</span><span class="season-desc">' + theme.desc + '</span>';
       }
 
-      // 右側運勢小框：連到 Google 搜尋「今日XX座運勢」
+      // 右側運勢：直接顯示當日十二星座短運勢（依日期變化，免點擊）
       const signs = ['牡羊座','金牛座','雙子座','巨蟹座','獅子座','處女座','天秤座','天蠍座','射手座','魔羯座','水瓶座','雙魚座'];
-      const chips = document.getElementById('zodiacChips');
-      if (chips) {
-        const y = now.getFullYear();
-        const mo = now.getMonth() + 1;
-        const d = now.getDate();
-        const dateStr = y + '/' + mo + '/' + d;
-        chips.innerHTML = signs.map(function(s) {
-          const q = encodeURIComponent(dateStr + ' ' + s + ' 今日運勢');
-          const url = 'https://www.google.com/search?q=' + q + '&hl=zh-TW';
-          return '<a href="' + url + '" target="_blank" rel="noopener">' + s + '</a>';
+      const tipsPool = [
+        '適合把重要行程提早確認，路上較順心。',
+        '與人溝通宜簡潔清楚，可減少誤會。',
+        '小額支出先記一筆，財務更踏實。',
+        '給自己一點緩衝時間，行程更從容。',
+        '適合聯繫久未聯絡的親友或客戶。',
+        '決策前多看一眼細節，會更安心。',
+        '今日適合規劃短途移動與接送安排。',
+        '保持彈性，突發狀況也能沉穩處理。',
+        '貴人運在服務與協助他人時出現。',
+        '身體與心情同步放慢一點更有利。',
+        '先完成最重要的一件事，效率最高。',
+        '一句善意的問候，能帶來好緣分。',
+        '出門前再核對時間與會合地點。',
+        '適合收集報價與比較方案再決定。',
+        '耐心等候的結果，往往比急躁更好。',
+        '今日宜穩紮穩打，不宜衝動變更。'
+      ];
+      const dayKey = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+      const box = document.getElementById('zodiacFortunes');
+      const note = document.getElementById('zodiacDateNote');
+      if (note) {
+        note.textContent = (now.getMonth() + 1) + '/' + now.getDate() + ' 十二星座運勢（可上下滑動）';
+      }
+      if (box) {
+        box.innerHTML = signs.map(function(s, i) {
+          const tip = tipsPool[(dayKey + i * 7) % tipsPool.length];
+          return '<div class="zf-item"><div class="zf-sign">' + s + '</div><div>' + tip + '</div></div>';
         }).join('');
       }
       const toggle = document.getElementById('zodiacToggle');
@@ -1311,141 +1256,6 @@
       document.getElementById('confirmModal').classList.remove('show');
     });
 
-
-
-    // ===== 背景輕音樂：10 首隨機、可調音量 =====
-    (function() {
-      // 免版稅示範曲（Pixabay 等，可自行換成你有授權的 mp3 網址）
-      const playlist = [
-        { name: '平靜視野', url: 'https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3' },
-        { name: '安靜時光', url: 'https://assets.mixkit.co/music/preview/mixkit-quiet-dyad-442.mp3' },
-        { name: '夢境漫遊', url: 'https://assets.mixkit.co/music/preview/mixkit-dreaming-big-31.mp3' },
-        { name: '林間漫步', url: 'https://assets.mixkit.co/music/preview/mixkit-spirit-in-the-woods-79.mp3' },
-        { name: '睡意輕柔', url: 'https://assets.mixkit.co/music/preview/mixkit-sleepy-cat-135.mp3' },
-        { name: '霧色夜晚', url: 'https://assets.mixkit.co/music/preview/mixkit-hazy-after-hours-7.mp3' },
-        { name: '美麗的夢', url: 'https://assets.mixkit.co/music/preview/mixkit-beautiful-dream-493.mp3' },
-        { name: '慢活節拍', url: 'https://assets.mixkit.co/music/preview/mixkit-relax-beats-119.mp3' },
-        { name: '晨光微亮', url: 'https://assets.mixkit.co/music/preview/mixkit-sun-and-his-daughter-580.mp3' },
-        { name: '溫柔陪伴', url: 'https://assets.mixkit.co/music/preview/mixkit-caterpillar-794.mp3' }
-      ]
-
-      const audio = document.getElementById('bgAudio');
-      const player = document.getElementById('musicPlayer');
-      const nameEl = document.getElementById('mpTrackName');
-      const btnPlay = document.getElementById('mpPlay');
-      const btnNext = document.getElementById('mpNext');
-      const btnPrev = document.getElementById('mpPrev');
-      const vol = document.getElementById('mpVolume');
-      const volLabel = document.getElementById('mpVolLabel');
-      if (!audio || !player) return;
-
-      let order = [];
-      let idx = 0;
-      let started = false;
-
-      function shuffleOrder() {
-        order = playlist.map(function(_, i) { return i; });
-        for (let i = order.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          const t = order[i]; order[i] = order[j]; order[j] = t;
-        }
-        idx = 0;
-      }
-
-      function currentTrack() {
-        return playlist[order[idx]] || playlist[0];
-      }
-
-      function loadTrack(autoplay) {
-        const t = currentTrack();
-        nameEl.textContent = t.name;
-        audio.src = t.url;
-        audio.load();
-        if (autoplay) {
-          audio.play().then(function() {
-            btnPlay.textContent = '⏸';
-          }).catch(function() {
-            btnPlay.textContent = '▶';
-            nameEl.textContent = t.name + '（請按播放）';
-          });
-        }
-      }
-
-      function nextTrack(autoplay) {
-        idx = (idx + 1) % order.length;
-        if (idx === 0) shuffleOrder();
-        loadTrack(autoplay !== false);
-      }
-
-      function prevTrack() {
-        idx = (idx - 1 + order.length) % order.length;
-        loadTrack(true);
-      }
-
-      audio.volume = (parseInt(vol.value, 10) || 25) / 100;
-      vol.addEventListener('input', function() {
-        const v = parseInt(vol.value, 10) || 0;
-        audio.volume = v / 100;
-        volLabel.textContent = String(v);
-      });
-
-      btnPlay.addEventListener('click', function() {
-        if (audio.paused) {
-          audio.play().then(function() { btnPlay.textContent = '⏸'; }).catch(function() {});
-        } else {
-          audio.pause();
-          btnPlay.textContent = '▶';
-        }
-      });
-      btnNext.addEventListener('click', function() { nextTrack(true); });
-      btnPrev.addEventListener('click', function() { prevTrack(); });
-      audio.addEventListener('ended', function() { nextTrack(true); });
-      audio.addEventListener('error', function() {
-        nameEl.textContent = '此曲無法播放，切換下一首…';
-        setTimeout(function() { nextTrack(true); }, 800);
-      });
-
-      shuffleOrder();
-      loadTrack(false);
-
-      // 同意條款後顯示播放器並嘗試播放（瀏覽器可能仍需使用者再按一次）
-      const mpMin = document.getElementById('mpMin');
-      const mpClose = document.getElementById('mpClose');
-      const mpFab = document.getElementById('mpFab');
-      if (mpMin) {
-        mpMin.addEventListener('click', function() {
-          player.classList.toggle('collapsed');
-          mpMin.textContent = player.classList.contains('collapsed') ? '□' : '－';
-        });
-      }
-      if (mpClose) {
-        mpClose.addEventListener('click', function() {
-          audio.pause();
-          btnPlay.textContent = '▶';
-          player.classList.remove('show');
-          player.classList.remove('collapsed');
-          if (mpFab) mpFab.style.display = 'block';
-        });
-      }
-      if (mpFab) {
-        mpFab.addEventListener('click', function() {
-          mpFab.style.display = 'none';
-          player.classList.add('show');
-          player.classList.remove('collapsed');
-          if (mpMin) mpMin.textContent = '－';
-        });
-      }
-
-      window.__startBgMusic = function() {
-        player.classList.add('show');
-        if (mpFab) mpFab.style.display = 'none';
-        if (started) return;
-        started = true;
-        // 預設較小音量、抒情曲；若瀏覽器擋自動播放，使用者可按 ▶
-        loadTrack(true);
-      };
-    })();
-
     // ===== 進站必讀 + 防機器人 =====
     (function() {
       const overlay = document.getElementById('termsOverlay');
@@ -1520,7 +1330,6 @@
         var zf = document.getElementById('zodiacFloat');
         if (sb) sb.style.display = 'block';
         if (zf) zf.style.display = 'block';
-        if (typeof window.__startBgMusic === 'function') window.__startBgMusic();
         try { sessionStorage.setItem('termsOk', '1'); } catch(e) {}
       });
 
