@@ -60,11 +60,20 @@
       const key = document.getElementById('key').value.trim();
       const msg = document.getElementById('msg');
       msg.textContent = '';
+      if (!key) {
+        msg.innerHTML = '<p class="err">請輸入後台金鑰</p>';
+        return;
+      }
       try {
-        const res = await fetch('/api/admin/customers?key=' + encodeURIComponent(key));
-        const data = await res.json();
+        const res = await fetch('/api/admin/customers', {
+          headers: { 'x-admin-key': key, 'Accept': 'application/json' }
+        });
+        let data = {};
+        try { data = await res.json(); } catch (e) {}
         if (!res.ok) {
-          msg.innerHTML = '<p class="err">' + (data.error || '載入失敗') + '</p>';
+          var extra = '';
+          if (data.inputLen != null) extra = '（你輸入 ' + data.inputLen + ' 字，伺服器金鑰 ' + data.expectedLen + ' 字）';
+          msg.innerHTML = '<p class="err">' + (data.error || ('載入失敗 HTTP ' + res.status)) + extra + '<br>請確認 Railway Variables 的 ADMIN_KEY 與輸入完全相同，並已重新部署成功。</p>';
           return;
         }
         document.getElementById('summary').textContent = '共 ' + data.total + ' 位客戶（依預約次數排序）';
@@ -91,7 +100,7 @@
             const nm = btn.getAttribute('data-name') || '此客戶';
             if (!confirm('確定要刪除「' + nm + '」的客戶明細嗎？\n刪除後預約次數紀錄將無法復原。')) return;
             try {
-              const res = await fetch('/api/admin/customers?key=' + encodeURIComponent(window.__adminKey) + '&customerKey=' + encodeURIComponent(ck), { method: 'DELETE' });
+              const res = await fetch('/api/admin/customers?customerKey=' + encodeURIComponent(ck), { method: 'DELETE', headers: { 'x-admin-key': window.__adminKey } });
               const data = await res.json();
               if (!res.ok) {
                 alert(data.error || '刪除失敗');

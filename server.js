@@ -77,14 +77,29 @@ async function appendBookingToSheet(booking) {
 
 const CSV_PATH = path.join(__dirname, 'bookings.csv');
 const CUSTOMERS_PATH = path.join(__dirname, 'customers.json');
-const ADMIN_KEY = String(process.env.ADMIN_KEY || 'xinxing2026').trim();
+function getAdminKeyExpected() {
+  return String(process.env.ADMIN_KEY || 'xinxing2026').trim();
+}
 
 function getAdminKeyFromReq(req) {
   const q = req.query && req.query.key;
-  const h = req.headers && req.headers['x-admin-key'];
+  const h = req.headers && (req.headers['x-admin-key'] || req.headers['X-Admin-Key']);
   const b = req.body && req.body.key;
   return String(q || h || b || '').trim();
 }
+
+function adminUnauthorized(res, key) {
+  const expected = getAdminKeyExpected();
+  return res.status(401).json({
+    error: '未授權',
+    inputLen: key.length,
+    expectedLen: expected.length,
+    hint: expected.length === 11 && !process.env.ADMIN_KEY
+      ? '目前使用預設金鑰（若你有設 ADMIN_KEY 卻仍如此，代表變數未生效）'
+      : '請使用 Railway 裡 ADMIN_KEY 的完整值（不是預設 xinxing2026）'
+  });
+}
+
 
 
 function normalizePhone(p) {
@@ -400,8 +415,8 @@ app.get('/api/horoscope', function(req, res) {
 
 app.delete('/api/admin/customers', function(req, res) {
   const key = getAdminKeyFromReq(req);
-  if (key !== ADMIN_KEY) {
-    return res.status(401).json({ error: '未授權' });
+  if (key !== getAdminKeyExpected()) {
+    return adminUnauthorized(res, key);
   }
   const customerKey = (req.query.customerKey || (req.body && req.body.customerKey) || '').trim();
   if (!customerKey) {
@@ -419,17 +434,19 @@ app.delete('/api/admin/customers', function(req, res) {
 
 app.get('/api/admin/ping', function(req, res) {
   const key = getAdminKeyFromReq(req);
+  const expected = getAdminKeyExpected();
   res.json({
-    ok: key === ADMIN_KEY,
+    ok: key === expected,
     inputLen: key.length,
-    expectedLen: ADMIN_KEY.length
+    expectedLen: expected.length,
+    envSet: !!process.env.ADMIN_KEY
   });
 });
 
 app.get('/api/admin/customers', function(req, res) {
   const key = getAdminKeyFromReq(req);
-  if (key !== ADMIN_KEY) {
-    return res.status(401).json({ error: '未授權' });
+  if (key !== getAdminKeyExpected()) {
+    return adminUnauthorized(res, key);
   }
   const customers = loadCustomers();
   const list = Object.keys(customers).map(function(k) { return customers[k]; });
