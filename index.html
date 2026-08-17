@@ -2,6 +2,9 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="心星機場接送">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>機場接送｜包車旅遊｜訂製預約｜心星接送</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -551,6 +554,91 @@
       animation: vcShine 3s linear infinite;
     }
 
+  
+    .util-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin: 10px 0 4px;
+    }
+    .util-btns button, .util-btns a.util-btn {
+      font-family: inherit;
+      border: 1px solid rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .util-btns button:hover, .util-btns a.util-btn:hover {
+      background: rgba(255,255,255,0.28);
+    }
+    .round-block {
+      display: none;
+      margin: 12px 0;
+      padding: 14px;
+      border: 2px solid #f9a8d4;
+      border-radius: 12px;
+      background: #fff7fb;
+    }
+    .round-block.show { display: block; }
+    .round-block h3 {
+      margin: 0 0 10px;
+      color: #be185d;
+      font-size: 1rem;
+    }
+    .time-hint {
+      font-size: 0.78rem;
+      color: #b45309;
+      background: #fff7ed;
+      border-left: 3px solid #f59e0b;
+      padding: 8px 10px;
+      margin: 6px 0 12px;
+      border-radius: 0 8px 8px 0;
+      line-height: 1.45;
+    }
+    #appInstallModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.55);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    #appInstallModal.show { display: flex; }
+    #appInstallModal .box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 22px;
+      max-width: 420px;
+      width: 100%;
+      line-height: 1.55;
+      font-size: 0.92rem;
+    }
+    #appInstallModal h3 { margin: 0 0 10px; color: #be185d; }
+    #appInstallModal ol { padding-left: 1.2em; margin: 8px 0; }
+    #appInstallModal .close-x {
+      margin-top: 14px;
+      width: 100%;
+      border: none;
+      background: linear-gradient(135deg,#f472b6,#c026d3);
+      color: #fff;
+      font-weight: 700;
+      padding: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
   </style>
 </head>
 <body>
@@ -630,6 +718,10 @@
       <h1>💝心星⭐️機場接送</h1>
       <p class="visit-top" id="visitTop" style="display:none;">本站已服務瀏覽 <span class="vc-num" id="visitNumTop">—</span> 次</p>
       <p>填寫需求 → 確認摘要 → 送出後由專人報價回覆</p>
+      <div class="util-btns">
+        <button type="button" id="btnAddApp">📲 點擊這裡可以直接變成不用下載的APP（書籤）</button>
+        <button type="button" id="btnShare">🔗 分享給好友</button>
+      </div>
     </div>
 
     <div class="form-section">
@@ -644,13 +736,15 @@
         <input type="text" id="lineId" placeholder="您的 LINE ID" oninput="updateSummary()">
 
         <label>服務類型 *</label>
-        <select id="serviceType" required onchange="updateSummary()">
+        <select id="serviceType" required onchange="onServiceTypeChange();updateSummary()">
           <option value="送機">送機</option>
           <option value="接機">接機</option>
+          <option value="送機+接機（來回）">送機+接機（來回）</option>
           <option value="包車旅遊">包車旅遊</option>
           <option value="點對點接駁">點對點接駁</option>
         </select>
 
+        <div id="singleRouteExtras">
         <label>出發點地址 *</label>
         <input type="text" id="fromAddress" required placeholder="完整地址或地標" oninput="updateSummary()">
         <label style="font-weight:500;color:#666;">若無法清楚描述請補充</label>
@@ -684,20 +778,76 @@
         <label>航班編號（選填）</label>
         <input type="text" id="flightNo" placeholder="例如：CI123 / BR856" oninput="updateSummary()">
 
+        </div><!-- end singleRouteExtras -->
+        <div id="singleTripBlock">
         <div class="row">
           <div>
             <label>日期 *</label>
             <input type="date" id="date" required onchange="updateSummary()">
           </div>
           <div>
-            <label>航班起飛時間</label>
+            <label id="labelFlightTime">航班起飛時間</label>
             <input type="time" id="flightTime" onchange="updateSummary()">
           </div>
         </div>
 
-        <label>出發時間（司機抵達／出發）*</label>
+        <label id="labelPickupTime">預計出發時間 *</label>
         <input type="time" id="pickupTime" required onchange="updateSummary()">
+        <div class="time-hint" id="timeHintSend">
+          <strong>送機建議提前抵達機場：</strong>北部約提前 <strong>3 小時</strong>、中部約 <strong>4 小時</strong>、南部約 <strong>6 小時</strong>（含路程與航廈報到／安檢時間，實際請依航班與路況調整）。此欄請填「司機接到您、預計出發」的時間。
+        </div>
+        <div class="time-hint" id="timeHintPick" style="display:none;">
+          <strong>接機請填「航班落地時間」</strong>。航站免費等候自航班落地起算 60 分鐘；逾時可能另計費用。夜間 22:00–06:00 可能加收夜間費用。
+        </div>
         <p class="hint">夜間時段 22:00–06:00 可能加收費用，實際以報價為準</p>
+        </div>
+
+        <!-- 來回：送機 + 接機 兩段 -->
+        <div class="round-block" id="roundTripBlock">
+          <h3>✈️ 送機行程</h3>
+          <div class="row">
+            <div>
+              <label>送機日期 *</label>
+              <input type="date" id="sendDate" onchange="updateSummary()">
+            </div>
+            <div>
+              <label>預計出發時間 *</label>
+              <input type="time" id="sendTime" onchange="updateSummary()">
+            </div>
+          </div>
+          <div class="time-hint">
+            送機建議：北部提前約 3 小時、中部約 4 小時、南部約 6 小時抵達機場。請填「預計出發時間」。
+          </div>
+          <label>送機出發地址 *</label>
+          <input type="text" id="sendFrom" placeholder="住家或上車地點" oninput="updateSummary()">
+          <label>送機目的地（機場／航廈）*</label>
+          <input type="text" id="sendTo" placeholder="例如：桃園機場第一航廈" oninput="updateSummary()">
+          <label>送機航班編號（選填）</label>
+          <input type="text" id="sendFlight" placeholder="例如：CI123" oninput="updateSummary()">
+          <label>送機－航班起飛時間（選填）</label>
+          <input type="time" id="sendFlightTime" onchange="updateSummary()">
+
+          <h3 style="margin-top:18px;">🛬 接機行程</h3>
+          <div class="row">
+            <div>
+              <label>接機日期 *</label>
+              <input type="date" id="pickDate" onchange="updateSummary()">
+            </div>
+            <div>
+              <label>航班落地時間 *</label>
+              <input type="time" id="pickTime" onchange="updateSummary()">
+            </div>
+          </div>
+          <div class="time-hint">
+            接機請填航班落地時間；免費等候自落地起算 60 分鐘。
+          </div>
+          <label>接機出發（機場／航廈）*</label>
+          <input type="text" id="pickFrom" placeholder="例如：桃園機場第二航廈" oninput="updateSummary()">
+          <label>接機目的地（送達地址）*</label>
+          <input type="text" id="pickTo" placeholder="住家或目的地完整地址" oninput="updateSummary()">
+          <label>接機航班編號（選填）</label>
+          <input type="text" id="pickFlight" placeholder="例如：BR856" oninput="updateSummary()">
+        </div>
 
         <div id="cnyWarning" class="cny-warn">
           ⚠️ 您選擇的日期落在過年期間，可能加收費用，實際以專人報價為準
@@ -1062,10 +1212,72 @@
       ].filter(Boolean).join('、') || '無';
     }
 
+
+    function isRoundTrip() {
+      return document.getElementById('serviceType').value === '送機+接機（來回）';
+    }
+
+    function onServiceTypeChange() {
+      const st = document.getElementById('serviceType').value;
+      const single = document.getElementById('singleTripBlock');
+      const round = document.getElementById('roundTripBlock');
+      const labelPick = document.getElementById('labelPickupTime');
+      const labelFlight = document.getElementById('labelFlightTime');
+      const hintSend = document.getElementById('timeHintSend');
+      const hintPick = document.getElementById('timeHintPick');
+      const pickup = document.getElementById('pickupTime');
+      const dateEl = document.getElementById('date');
+      const fromEl = document.getElementById('fromAddress');
+      const toEl = document.getElementById('toAddress');
+
+      const extras = document.getElementById('singleRouteExtras');
+      if (st === '送機+接機（來回）') {
+        if (single) single.style.display = 'none';
+        if (extras) extras.style.display = 'none';
+        if (round) round.classList.add('show');
+        // 單趟必填改非必填，避免來回時被擋
+        if (pickup) pickup.required = false;
+        if (dateEl) dateEl.required = false;
+        if (fromEl) fromEl.required = false;
+        if (toEl) toEl.required = false;
+      } else {
+        if (single) single.style.display = 'block';
+        if (extras) extras.style.display = 'block';
+        if (round) round.classList.remove('show');
+        if (pickup) pickup.required = true;
+        if (dateEl) dateEl.required = true;
+        if (fromEl) fromEl.required = true;
+        if (toEl) toEl.required = true;
+
+        if (st === '送機') {
+          if (labelPick) labelPick.textContent = '預計出發時間 *';
+          if (labelFlight) labelFlight.textContent = '航班起飛時間（選填，供對照）';
+          if (hintSend) hintSend.style.display = 'block';
+          if (hintPick) hintPick.style.display = 'none';
+        } else if (st === '接機') {
+          if (labelPick) labelPick.textContent = '航班落地時間 *';
+          if (labelFlight) labelFlight.textContent = '其他參考時間（選填）';
+          if (hintSend) hintSend.style.display = 'none';
+          if (hintPick) hintPick.style.display = 'block';
+        } else {
+          if (labelPick) labelPick.textContent = '出發時間（司機抵達／出發）*';
+          if (labelFlight) labelFlight.textContent = '參考時間（選填）';
+          if (hintSend) hintSend.style.display = 'none';
+          if (hintPick) hintPick.style.display = 'none';
+        }
+      }
+    }
+
     function updateSummary() {
-      const date = document.getElementById('date').value || '—';
+      const st0 = document.getElementById('serviceType').value;
+      const date = st0 === '送機+接機（來回）'
+        ? (document.getElementById('sendDate').value || document.getElementById('pickDate').value || '—')
+        : (document.getElementById('date').value || '—');
       const cnyEl = document.getElementById('cnyWarning');
-      if (cnyEl) cnyEl.style.display = isCnyDate(date) ? 'block' : 'none';
+      if (cnyEl) {
+        const d2 = document.getElementById('pickDate') ? document.getElementById('pickDate').value : '';
+        cnyEl.style.display = (isCnyDate(date) || isCnyDate(d2)) ? 'block' : 'none';
+      }
 
       const from = document.getElementById('fromAddress').value.trim() || '—';
       const fromNote = document.getElementById('fromAddressNote').value.trim();
@@ -1087,15 +1299,39 @@
       }
 
       const html =
-        '<strong>日期：</strong>' + date + (isCnyDate(date) ? ' <span style="color:#dc2626;">（過年期間）</span>' : '') + '<br>' +
+        (st0 === '送機+接機（來回）' ? '' : ('<strong>日期：</strong>' + date + (isCnyDate(date) ? ' <span style="color:#dc2626;">（過年期間）</span>' : '') + '<br>')) +
         '<strong>聯絡人：</strong>' + (document.getElementById('name').value.trim() || '—') + '<br>' +
         '<strong>聯絡電話：</strong>' + (document.getElementById('phone').value.trim() || '—') + '<br>' +
         '<strong>LINE ID：</strong>' + (document.getElementById('lineId').value.trim() || '—') + '<br>' +
         '<strong>服務類型：</strong>' + document.getElementById('serviceType').value + '<br>' +
-        '<strong>出發時間：</strong>' + pickup + ' ' + nightNote + '<br>' +
-        '<strong>航班起飛時間：</strong>' + (document.getElementById('flightTime').value || '—') + '<br>' +
-        '<strong>出發地點：</strong>' + fromLine + '<br>' +
-        '<strong>目的地：</strong>' + toLine + '<br>' +
+        (function(){
+          const st = document.getElementById('serviceType').value;
+          if (st === '送機+接機（來回）') {
+            return (
+              '<strong>【送機】</strong><br>' +
+              '　日期：' + (document.getElementById('sendDate').value || '—') + '<br>' +
+              '　預計出發時間：' + (document.getElementById('sendTime').value || '—') + '<br>' +
+              '　出發：' + (document.getElementById('sendFrom').value.trim() || '—') + '<br>' +
+              '　目的地：' + (document.getElementById('sendTo').value.trim() || '—') + '<br>' +
+              '　航班：' + (document.getElementById('sendFlight').value.trim() || '—') +
+                '　起飛：' + (document.getElementById('sendFlightTime').value || '—') + '<br>' +
+              '<strong>【接機】</strong><br>' +
+              '　日期：' + (document.getElementById('pickDate').value || '—') + '<br>' +
+              '　航班落地時間：' + (document.getElementById('pickTime').value || '—') + '<br>' +
+              '　機場出發：' + (document.getElementById('pickFrom').value.trim() || '—') + '<br>' +
+              '　送達：' + (document.getElementById('pickTo').value.trim() || '—') + '<br>' +
+              '　航班：' + (document.getElementById('pickFlight').value.trim() || '—') + '<br>'
+            );
+          }
+          const timeLabel = st === '接機' ? '航班落地時間' : (st === '送機' ? '預計出發時間' : '出發時間');
+          const flightLabel = st === '接機' ? '其他參考時間' : '航班起飛時間';
+          return (
+            '<strong>' + timeLabel + '：</strong>' + pickup + ' ' + nightNote + '<br>' +
+            '<strong>' + flightLabel + '：</strong>' + (document.getElementById('flightTime').value || '—') + '<br>' +
+            '<strong>出發地點：</strong>' + fromLine + '<br>' +
+            '<strong>目的地：</strong>' + toLine + '<br>'
+          );
+        })() +
         '<strong>航廈：</strong>' + (document.getElementById('terminal').value || '—') + '<br>' +
         '<strong>航班編號：</strong>' + (document.getElementById('flightNo').value.trim() || '—') + '<br>' +
         '<strong>人數：</strong>' + document.getElementById('passengers').value + ' 人<br>' +
@@ -1118,6 +1354,7 @@
       return pad(d.getHours()) + ':' + pad(d.getMinutes());
     }
     function validateDateTime() {
+      if (isRoundTrip()) return true;
       const dateEl = document.getElementById('date');
       const timeEl = document.getElementById('pickupTime');
       const dateVal = dateEl.value;
@@ -1143,6 +1380,10 @@
     }
 
     document.getElementById('date').min = todayStr();
+    ['sendDate','pickDate'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.min = todayStr();
+    });
     document.getElementById('date').addEventListener('change', function() {
       validateDateTime();
       updateSummary();
@@ -1152,6 +1393,7 @@
       updateSummary();
     });
     updateSummary();
+    onServiceTypeChange();
 
     function buildPlainSummary(orderId) {
       const date = document.getElementById('date').value || '—';
@@ -1174,19 +1416,40 @@
       lines.push('【心星機場接送｜預約需求】');
       lines.push('訂單編號：' + (orderId || '—'));
       lines.push('────────');
-      lines.push('日期：' + date + (isCnyDate(date) ? '（過年期間）' : ''));
+      if (document.getElementById('serviceType').value !== '送機+接機（來回）') {
+        lines.push('日期：' + date + (isCnyDate(date) ? '（過年期間）' : ''));
+      }
       lines.push('聯絡人：' + (document.getElementById('name').value.trim() || '—'));
       lines.push('聯絡電話：' + (document.getElementById('phone').value.trim() || '—'));
       lines.push('LINE ID：' + (document.getElementById('lineId').value.trim() || '—'));
-      lines.push('服務類型：' + document.getElementById('serviceType').value);
-      lines.push('出發時間：' + pickup + ' ' + nightNote);
-      lines.push('航班起飛時間：' + (document.getElementById('flightTime').value || '—'));
-      lines.push('出發地點：' + from + (fromNote ? '（' + fromNote + '）' : ''));
-      if (stop1) lines.push('停靠點1：' + stop1 + (stop1Note ? '（' + stop1Note + '）' : ''));
-      if (stop2) lines.push('停靠點2：' + stop2 + (stop2Note ? '（' + stop2Note + '）' : ''));
-      lines.push('目的地：' + to + (toNote ? '（' + toNote + '）' : ''));
-      lines.push('航廈：' + (document.getElementById('terminal').value || '—'));
-      lines.push('航班編號：' + (document.getElementById('flightNo').value.trim() || '—'));
+      const st = document.getElementById('serviceType').value;
+      lines.push('服務類型：' + st);
+      if (st === '送機+接機（來回）') {
+        lines.push('【送機行程】');
+        lines.push('送機日期：' + (document.getElementById('sendDate').value || '—') + (isCnyDate(document.getElementById('sendDate').value) ? '（過年期間）' : ''));
+        lines.push('預計出發時間：' + (document.getElementById('sendTime').value || '—'));
+        lines.push('送機出發：' + (document.getElementById('sendFrom').value.trim() || '—'));
+        lines.push('送機目的地：' + (document.getElementById('sendTo').value.trim() || '—'));
+        lines.push('送機航班：' + (document.getElementById('sendFlight').value.trim() || '—'));
+        lines.push('送機起飛時間：' + (document.getElementById('sendFlightTime').value || '—'));
+        lines.push('【接機行程】');
+        lines.push('接機日期：' + (document.getElementById('pickDate').value || '—') + (isCnyDate(document.getElementById('pickDate').value) ? '（過年期間）' : ''));
+        lines.push('航班落地時間：' + (document.getElementById('pickTime').value || '—'));
+        lines.push('接機機場出發：' + (document.getElementById('pickFrom').value.trim() || '—'));
+        lines.push('接機送達：' + (document.getElementById('pickTo').value.trim() || '—'));
+        lines.push('接機航班：' + (document.getElementById('pickFlight').value.trim() || '—'));
+      } else {
+        const timeLabel = st === '接機' ? '航班落地時間' : (st === '送機' ? '預計出發時間' : '出發時間');
+        const flightLabel = st === '接機' ? '其他參考時間' : '航班起飛時間';
+        lines.push(timeLabel + '：' + pickup + ' ' + nightNote);
+        lines.push(flightLabel + '：' + (document.getElementById('flightTime').value || '—'));
+        lines.push('出發地點：' + from + (fromNote ? '（' + fromNote + '）' : ''));
+        if (stop1) lines.push('停靠點1：' + stop1 + (stop1Note ? '（' + stop1Note + '）' : ''));
+        if (stop2) lines.push('停靠點2：' + stop2 + (stop2Note ? '（' + stop2Note + '）' : ''));
+        lines.push('目的地：' + to + (toNote ? '（' + toNote + '）' : ''));
+        lines.push('航廈：' + (document.getElementById('terminal').value || '—'));
+        lines.push('航班編號：' + (document.getElementById('flightNo').value.trim() || '—'));
+      }
       lines.push('人數：' + document.getElementById('passengers').value + ' 人');
       lines.push('行李：' + document.getElementById('luggage').value + ' 件（' + getLuggageDetail() + '）');
       lines.push('車型：' + document.getElementById('vehicle').value);
@@ -1200,9 +1463,20 @@
 
     document.getElementById('bookingForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      if (!validateDateTime()) return;
-      const dateVal = document.getElementById('date').value;
-      const timeVal = document.getElementById('pickupTime').value;
+      if (isRoundTrip()) {
+        const need = [
+          ['sendDate','送機日期'],['sendTime','送機預計出發時間'],['sendFrom','送機出發地址'],['sendTo','送機目的地'],
+          ['pickDate','接機日期'],['pickTime','航班落地時間'],['pickFrom','接機機場'],['pickTo','接機送達地址']
+        ];
+        for (const [id, lab] of need) {
+          const v = (document.getElementById(id).value || '').trim();
+          if (!v) { alert('請填寫：' + lab); document.getElementById(id).focus(); return; }
+        }
+      } else {
+        if (!validateDateTime()) return;
+      }
+      const dateVal = document.getElementById('date').value || document.getElementById('sendDate').value || '';
+      const timeVal = document.getElementById('pickupTime').value || document.getElementById('sendTime').value || '';
       if (!dateVal || !timeVal) {
         alert('請填寫日期與出發時間');
         return;
@@ -1406,6 +1680,55 @@
       // 同セッション已同意可跳過（重新整理仍需閱讀可拿掉這段）
       // 依需求：每次進入都要閱讀，故不自動跳過
     })();
+
+  
+    // 加到主畫面 / 分享
+    document.getElementById('btnAddApp').addEventListener('click', function() {
+      // 嘗試 PWA 安裝
+      if (window._deferredPrompt) {
+        window._deferredPrompt.prompt();
+        window._deferredPrompt.userChoice.then(function(){ window._deferredPrompt = null; });
+        return;
+      }
+      document.getElementById('appInstallModal').classList.add('show');
+    });
+    document.getElementById('btnCloseAppModal').addEventListener('click', function() {
+      document.getElementById('appInstallModal').classList.remove('show');
+    });
+    document.getElementById('appInstallModal').addEventListener('click', function(e) {
+      if (e.target.id === 'appInstallModal') e.currentTarget.classList.remove('show');
+    });
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      window._deferredPrompt = e;
+    });
+    document.getElementById('btnShare').addEventListener('click', async function() {
+      const shareData = {
+        title: '💝心星⭐️機場接送',
+        text: '機場接送／包車旅遊線上預約，填寫後專人報價',
+        url: location.href
+      };
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(location.href);
+          alert('已複製網站連結，可貼給好友分享！');
+        } else {
+          prompt('請複製此連結分享給好友：', location.href);
+        }
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+        try {
+          await navigator.clipboard.writeText(location.href);
+          alert('已複製網站連結，可貼給好友分享！');
+        } catch (e2) {
+          prompt('請複製此連結分享給好友：', location.href);
+        }
+      }
+    });
+    // 初始化服務類型標籤
+    onServiceTypeChange();
 
   </script>
 </body>
