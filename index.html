@@ -644,7 +644,7 @@
       border-radius: 0 8px 8px 0;
       line-height: 1.45;
     }
-    #appInstallModal {
+    #shareModal, #appInstallModal {
       display: none;
       position: fixed;
       inset: 0;
@@ -654,8 +654,8 @@
       justify-content: center;
       padding: 16px;
     }
-    #appInstallModal.show { display: flex; }
-    #appInstallModal .box {
+    #shareModal.show, #appInstallModal.show { display: flex; }
+    #shareModal .box, #appInstallModal .box {
       background: #fff;
       border-radius: 16px;
       padding: 22px;
@@ -664,9 +664,9 @@
       line-height: 1.55;
       font-size: 0.92rem;
     }
-    #appInstallModal h3 { margin: 0 0 10px; color: #be185d; }
-    #appInstallModal ol { padding-left: 1.2em; margin: 8px 0; }
-    #appInstallModal .close-x {
+    #shareModal h3, #appInstallModal h3 { margin: 0 0 10px; color: #be185d; }
+    #shareModal ol, #appInstallModal ol { padding-left: 1.2em; margin: 8px 0; }
+    #shareModal .close-x, #appInstallModal .close-x {
       margin-top: 14px;
       width: 100%;
       border: none;
@@ -677,6 +677,46 @@
       border-radius: 10px;
       cursor: pointer;
       font-family: inherit;
+    }
+
+  
+    .share-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0 8px;
+    }
+    .share-grid a, .share-grid button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 14px 8px;
+      border-radius: 12px;
+      border: 1px solid #fbcfe8;
+      background: #fff;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #831843;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .share-grid a:hover, .share-grid button:hover {
+      background: #fdf2f8;
+      border-color: #f472b6;
+    }
+    .share-grid .ico { font-size: 1.6rem; line-height: 1; }
+    .share-url {
+      width: 100%;
+      font-size: 0.75rem;
+      padding: 8px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-top: 8px;
+      word-break: break-all;
+      box-sizing: border-box;
     }
 
   </style>
@@ -1732,53 +1772,189 @@
 
   
     // 加到主畫面 / 分享
-    document.getElementById('btnAddApp').addEventListener('click', function() {
-      // 嘗試 PWA 安裝
-      if (window._deferredPrompt) {
-        window._deferredPrompt.prompt();
-        window._deferredPrompt.userChoice.then(function(){ window._deferredPrompt = null; });
-        return;
+    (function() {
+      function siteUrl() { return location.href.split('#')[0]; }
+      function siteText() {
+        return '💝心星⭐️機場接送｜機場接送／包車旅遊線上預約，填寫後專人報價\n' + siteUrl();
       }
-      document.getElementById('appInstallModal').classList.add('show');
-    });
-    document.getElementById('btnCloseAppModal').addEventListener('click', function() {
-      document.getElementById('appInstallModal').classList.remove('show');
-    });
-    document.getElementById('appInstallModal').addEventListener('click', function(e) {
-      if (e.target.id === 'appInstallModal') e.currentTarget.classList.remove('show');
-    });
-    window.addEventListener('beforeinstallprompt', function(e) {
-      e.preventDefault();
-      window._deferredPrompt = e;
-    });
-    document.getElementById('btnShare').addEventListener('click', async function() {
-      const shareData = {
-        title: '💝心星⭐️機場接送',
-        text: '機場接送／包車旅遊線上預約，填寫後專人報價',
-        url: location.href
-      };
-      try {
-        if (navigator.share) {
-          await navigator.share(shareData);
-        } else if (navigator.clipboard && navigator.clipboard.writeText) {
-          await navigator.clipboard.writeText(location.href);
-          alert('已複製網站連結，可貼給好友分享！');
-        } else {
-          prompt('請複製此連結分享給好友：', location.href);
-        }
-      } catch (err) {
-        if (err && err.name === 'AbortError') return;
-        try {
-          await navigator.clipboard.writeText(location.href);
-          alert('已複製網站連結，可貼給好友分享！');
-        } catch (e2) {
-          prompt('請複製此連結分享給好友：', location.href);
-        }
+      function showModal(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.add('show');
       }
-    });
+      function hideModal(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('show');
+      }
+
+      var btnApp = document.getElementById('btnAddApp');
+      if (btnApp) {
+        btnApp.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (window._deferredPrompt) {
+            try {
+              window._deferredPrompt.prompt();
+              window._deferredPrompt.userChoice.then(function(){ window._deferredPrompt = null; });
+              return;
+            } catch (err) {}
+          }
+          showModal('appInstallModal');
+        });
+      }
+
+      var btnShare = document.getElementById('btnShare');
+      if (btnShare) {
+        btnShare.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var url = siteUrl();
+          var text = siteText();
+          var box = document.getElementById('shareUrlBox');
+          if (box) box.value = url;
+          var tip = document.getElementById('shareTip');
+          if (tip) { tip.style.display = 'none'; tip.textContent = ''; }
+
+          var line = document.getElementById('shareLine');
+          if (line) line.href = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(url);
+
+          var wa = document.getElementById('shareWhatsApp');
+          if (wa) wa.href = 'https://wa.me/?text=' + encodeURIComponent(text);
+
+          var fb = document.getElementById('shareFB');
+          if (fb) fb.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+
+          showModal('shareModal');
+        });
+      }
+
+      var closeApp = document.getElementById('btnCloseAppModal');
+      if (closeApp) closeApp.addEventListener('click', function(){ hideModal('appInstallModal'); });
+      var closeShare = document.getElementById('btnCloseShareModal');
+      if (closeShare) closeShare.addEventListener('click', function(){ hideModal('shareModal'); });
+
+      ['appInstallModal','shareModal'].forEach(function(id){
+        var m = document.getElementById(id);
+        if (m) m.addEventListener('click', function(e){ if (e.target.id === id) hideModal(id); });
+      });
+
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        window._deferredPrompt = e;
+      });
+
+      var copyBtn = document.getElementById('shareCopy');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+          var url = siteUrl();
+          var tip = document.getElementById('shareTip');
+          function ok() {
+            if (tip) { tip.style.display = 'block'; tip.textContent = '✅ 已複製連結，可貼到任何 App 傳送'; }
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(ok).catch(function(){
+              var box = document.getElementById('shareUrlBox');
+              if (box) { box.select(); try { document.execCommand('copy'); ok(); } catch(e) {} }
+            });
+          } else {
+            var box = document.getElementById('shareUrlBox');
+            if (box) { box.select(); try { document.execCommand('copy'); ok(); } catch(e) { prompt('請複製連結：', url); } }
+          }
+        });
+      }
+
+      var nativeBtn = document.getElementById('shareNative');
+      if (nativeBtn) {
+        nativeBtn.addEventListener('click', async function() {
+          var data = { title: '💝心星⭐️機場接送', text: '機場接送／包車旅遊線上預約', url: siteUrl() };
+          try {
+            if (navigator.share) {
+              await navigator.share(data);
+            } else {
+              alert('此裝置不支援系統分享，請改用上方 LINE／WhatsApp 或複製連結。');
+            }
+          } catch (err) {
+            if (err && err.name === 'AbortError') return;
+          }
+        });
+      }
+
+      var wechatBtn = document.getElementById('shareWeChat');
+      if (wechatBtn) {
+        wechatBtn.addEventListener('click', function() {
+          var url = siteUrl();
+          var tip = document.getElementById('shareTip');
+          function done() {
+            if (tip) {
+              tip.style.display = 'block';
+              tip.textContent = '✅ 連結已複製。請開啟微信 → 選好友或群組 → 貼上傳送（微信網頁無法直接跳出分享）';
+            }
+            alert('微信無法由網頁直接開啟分享，已幫您複製連結。\n請打開微信，選擇好友後貼上即可。');
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(done).catch(done);
+          } else {
+            done();
+          }
+        });
+      }
+    })();
+
     // 初始化服務類型標籤
-    onServiceTypeChange();
+    try { onServiceTypeChange(); } catch (e) {}
+
 
   </script>
+
+<div id="appInstallModal">
+  <div class="box">
+    <h3>📲 變成不用下載的 APP</h3>
+    <p>把本站加到手機<strong>主畫面</strong>後，之後可像 APP 一樣一點即開（不必再搜尋網址）。</p>
+    <p><strong>iPhone（請用 Safari 開啟本頁）</strong></p>
+    <ol>
+      <li>點底部中間的 <strong>分享</strong> 按鈕（□↑）</li>
+      <li>向下滑，選 <strong>「加入主畫面」</strong></li>
+      <li>按右上角 <strong>「加入」</strong></li>
+    </ol>
+    <p><strong>Android（Chrome）</strong></p>
+    <ol>
+      <li>點右上角 <strong>⋮</strong> 選單</li>
+      <li>選 <strong>「安裝應用程式」</strong> 或 <strong>「加到主畫面」</strong></li>
+      <li>確認即可</li>
+    </ol>
+    <p><strong>電腦</strong>：按 <kbd>Ctrl</kbd>+<kbd>D</kbd>（Windows）或 <kbd>⌘</kbd>+<kbd>D</kbd>（Mac）加入書籤。</p>
+    <button type="button" class="close-x" id="btnCloseAppModal">我知道了</button>
+  </div>
+</div>
+
+<div id="shareModal" class="share-like-app">
+  <div class="box">
+    <h3>🔗 分享給好友</h3>
+    <p>請選擇要分享的 App（手機上通常會直接開啟該 App）：</p>
+    <div class="share-grid">
+      <a id="shareLine" href="#" target="_blank" rel="noopener">
+        <span class="ico">💬</span>LINE
+      </a>
+      <a id="shareWhatsApp" href="#" target="_blank" rel="noopener">
+        <span class="ico">🟢</span>WhatsApp
+      </a>
+      <a id="shareFB" href="#" target="_blank" rel="noopener">
+        <span class="ico">📘</span>Facebook
+      </a>
+      <button type="button" id="shareWeChat">
+        <span class="ico">🟢</span>微信 WeChat
+      </button>
+      <button type="button" id="shareNative">
+        <span class="ico">📤</span>系統分享
+      </button>
+      <button type="button" id="shareCopy">
+        <span class="ico">📋</span>複製連結
+      </button>
+    </div>
+    <input class="share-url" id="shareUrlBox" readonly>
+    <p id="shareTip" style="display:none;color:#059669;font-weight:700;margin-top:8px;"></p>
+    <button type="button" class="close-x" id="btnCloseShareModal">關閉</button>
+  </div>
+</div>
+
 </body>
 </html>
