@@ -131,6 +131,38 @@
     .header h1 { font-size: 1.45rem; margin-bottom: 6px; }
     .header p { opacity: 0.9; font-size: 0.92rem; }
     .form-section { padding: 24px; }
+
+    .trip-tabs {
+      display: flex;
+      gap: 6px;
+      margin: -8px -8px 18px;
+      padding: 6px;
+      background: #fdf2f8;
+      border-radius: 16px;
+      border: 1px solid #fbcfe8;
+    }
+    .trip-tabs button {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.95rem;
+      padding: 12px 8px;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #9d174d;
+    }
+    .trip-tabs button.on {
+      background: linear-gradient(135deg,#f472b6,#be185d);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(190,24,93,.25);
+    }
+    .trip-tabs button small { display: block; font-weight: 600; font-size: 0.7rem; opacity: .85; margin-top: 2px; }
+    #serviceTypeWrap { display: none; }
+    #otherTripWrap { display: none; margin-bottom: 12px; }
+    #otherTripWrap.show { display: block; }
+
     label {
       display: block;
       font-weight: 600;
@@ -890,6 +922,11 @@
     </div>
 
     <div class="form-section">
+      <div class="trip-tabs" role="tablist">
+        <button type="button" class="on" data-tab="接機">接機<small>落地接送</small></button>
+        <button type="button" data-tab="送機">送機<small>出發到機場</small></button>
+        <button type="button" data-tab="其他">其他行程<small>來回／包車／接駁</small></button>
+      </div>
       <form id="bookingForm">
         <label>客戶姓名 *</label>
         <input type="text" id="name" required placeholder="請輸入真實姓名" oninput="updateSummary()">
@@ -900,14 +937,24 @@
         <label>LINE ID（方便聯繫｜官方：<a class="line-link" href="https://lin.ee/XI6z6T8" target="_blank">lin.ee/XI6z6T8</a>）</label>
         <input type="text" id="lineId" placeholder="您的 LINE ID" oninput="updateSummary()">
 
+        <div id="serviceTypeWrap">
         <label>服務類型 *</label>
         <select id="serviceType" required onchange="onServiceTypeChange();updateSummary()">
+          <option value="接機" selected>接機</option>
           <option value="送機">送機</option>
-          <option value="接機">接機</option>
           <option value="送機+接機（來回）">送機+接機（來回）</option>
           <option value="包車旅遊">包車旅遊</option>
           <option value="點對點接駁">點對點接駁</option>
         </select>
+        </div>
+        <div id="otherTripWrap">
+          <label>其他行程細項 *</label>
+          <select id="otherTripType" onchange="onOtherTripChange();updateSummary()">
+            <option value="送機+接機（來回）">送機＋接機（來回）</option>
+            <option value="包車旅遊">包車旅遊</option>
+            <option value="點對點接駁">點對點接駁</option>
+          </select>
+        </div>
 
         <div id="singleRouteExtras">
         <label>出發點地址 *</label>
@@ -1379,6 +1426,34 @@
       ].filter(Boolean).join('、') || '無';
     }
 
+
+
+    function setTripTab(tab) {
+      document.querySelectorAll('.trip-tabs button').forEach(function(b){
+        b.classList.toggle('on', b.getAttribute('data-tab') === tab);
+      });
+      var other = document.getElementById('otherTripWrap');
+      var sel = document.getElementById('serviceType');
+      if (tab === '接機' || tab === '送機') {
+        if (other) other.classList.remove('show');
+        if (sel) sel.value = tab;
+      } else {
+        if (other) other.classList.add('show');
+        var sub = document.getElementById('otherTripType');
+        if (sel && sub) sel.value = sub.value;
+      }
+      if (typeof onServiceTypeChange === 'function') onServiceTypeChange();
+      if (typeof updateSummary === 'function') updateSummary();
+    }
+    function onOtherTripChange() {
+      var sub = document.getElementById('otherTripType');
+      var sel = document.getElementById('serviceType');
+      if (sub && sel) sel.value = sub.value;
+      if (typeof onServiceTypeChange === 'function') onServiceTypeChange();
+    }
+    document.querySelectorAll('.trip-tabs button').forEach(function(b){
+      b.addEventListener('click', function(){ setTripTab(b.getAttribute('data-tab')); });
+    });
 
     function isRoundTrip() {
       return document.getElementById('serviceType').value === '送機+接機（來回）';
@@ -2030,7 +2105,7 @@
       bindClose('btnCloseShareModal', 'shareModal');
     })();
 
-    try { onServiceTypeChange(); } catch (e) {}
+    try { setTripTab('接機'); } catch (e) { try { onServiceTypeChange(); } catch (e2) {} }
 
   </script>
 
