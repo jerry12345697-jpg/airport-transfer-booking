@@ -837,21 +837,10 @@ window.__closePopup = function(id) {
 
 <div id="shareModal" class="popup-overlay" aria-hidden="true">
   <div class="box" role="dialog">
-    <h3>🔗 分享給好友</h3>
-    <p>選擇要分享的方式：</p>
-    <div class="share-grid">
-      <a id="shareLine" href="#" target="_blank" rel="noopener"><span class="ico">💬</span>LINE</a>
-      <a id="shareWhatsApp" href="#" target="_blank" rel="noopener"><span class="ico">🟢</span>WhatsApp</a>
-      <button type="button" id="shareMessenger"><span class="ico">💙</span>Messenger</button>
-      <a id="shareFB" href="#" target="_blank" rel="noopener"><span class="ico">📘</span>Facebook</a>
-      <button type="button" id="shareWeChat"><span class="ico">🟢</span>微信（複製）</button>
-      <button type="button" id="shareNative"><span class="ico">📤</span>系統分享</button>
-      <button type="button" id="shareCopy"><span class="ico">📋</span>複製連結</button>
-      <button type="button" id="shareSMS"><span class="ico">短信</span>簡訊</button>
-    </div>
-    <input class="share-url" id="shareUrlBox" readonly>
-    <p id="shareTip" style="display:none;color:#059669;font-weight:700;margin-top:8px;"></p>
-    <button type="button" class="close-x" id="btnCloseShareModal" data-close="shareModal" onclick="window.__closePopup && window.__closePopup('shareModal'); return false;">關閉</button>
+    <h3>把心星接送傳給家人朋友</h3>
+    <p>點下方按鈕，用手機內建分享選單傳出（LINE、訊息、WhatsApp、郵件都可）。</p>
+    <button type="button" id="shareNative" class="close-x" style="margin-top:8px;">📤 開啟分享選單</button>
+    <button type="button" class="close-x" id="btnCloseShareModal" data-close="shareModal" onclick="window.__closePopup && window.__closePopup('shareModal'); return false;" style="background:#e5e7eb;color:#374151;margin-top:8px;">關閉</button>
   </div>
 </div>
 
@@ -942,8 +931,8 @@ window.__closePopup = function(id) {
         </button>
         <button type="button" id="btnShare" title="把預約網站分享給家人朋友">
           <span class="util-ico" aria-hidden="true">🔗</span>
-          <span class="util-title">分享給好友</span>
-          <span class="util-sub">一鍵傳連結給家人</span>
+          <span class="util-title">傳給家人朋友</span>
+          <span class="util-sub">開啟手機分享選單</span>
         </button>
       </div>
     </div>
@@ -2028,19 +2017,19 @@ window.__closePopup = function(id) {
         }
         if (t.closest('#btnShare')) {
           e.preventDefault();
-          var url = siteUrl();
-          var text = siteText();
-          var box = document.getElementById('shareUrlBox');
-          if (box) box.value = url;
-          var tip = document.getElementById('shareTip');
-          if (tip) { tip.style.display = 'none'; tip.textContent = ''; }
-          var line = document.getElementById('shareLine');
-          if (line) line.href = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(url);
-          var wa = document.getElementById('shareWhatsApp');
-          if (wa) wa.href = 'https://wa.me/?text=' + encodeURIComponent(text);
-          var fb = document.getElementById('shareFB');
-          if (fb) fb.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
-          showModal('shareModal');
+          var data = {
+            title: '💝心星⭐️機場接送',
+            text: '全台機場接送／包車旅遊，服務有價、專人報價。',
+            url: siteUrl()
+          };
+          if (navigator.share) {
+            navigator.share(data).catch(function(err){
+              if (err && err.name === 'AbortError') return;
+              showModal('shareModal');
+            });
+          } else {
+            showModal('shareModal');
+          }
           return;
         }
         if (t.closest('#shareMessenger')) {
@@ -2058,11 +2047,23 @@ window.__closePopup = function(id) {
         }
         if (t.closest('#shareNative')) {
           e.preventDefault();
-          var data = { title: '💝心星⭐️機場接送', text: '機場接送／包車旅遊線上預約', url: siteUrl() };
+          var data = {
+            title: '💝心星⭐️機場接送',
+            text: '全台機場接送／包車旅遊，服務有價、專人報價。',
+            url: siteUrl()
+          };
           if (navigator.share) {
-            navigator.share(data).catch(function(err){ if (!err || err.name !== 'AbortError') alert('請改用 LINE／WhatsApp 或複製連結'); });
+            navigator.share(data).then(function(){ hideModal('shareModal'); }).catch(function(err){
+              if (err && err.name === 'AbortError') return;
+              if (navigator.clipboard) navigator.clipboard.writeText(siteUrl());
+              alert('已複製網站連結，可自行貼給好友。');
+            });
+          } else if (navigator.clipboard) {
+            navigator.clipboard.writeText(siteUrl()).then(function(){
+              alert('此裝置沒有系統分享選單，已複製連結，請貼給好友。');
+            });
           } else {
-            alert('此瀏覽器不支援系統分享，請改用 LINE、WhatsApp 或複製連結。');
+            prompt('請複製此連結傳給好友：', siteUrl());
           }
           return;
         }
