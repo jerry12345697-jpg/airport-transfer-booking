@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://airport-transfer-booking-production.up.railway.app/sitemap.xml
