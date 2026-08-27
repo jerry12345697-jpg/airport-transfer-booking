@@ -837,8 +837,8 @@ window.__closePopup = function(id) {
 
 <div id="shareModal" class="popup-overlay" aria-hidden="true">
   <div class="box" role="dialog">
-    <h3>把心星接送傳給家人朋友</h3>
-    <p>點下方按鈕，用手機內建分享選單傳出（LINE、訊息、WhatsApp、郵件都可）。</p>
+    <h3>把心星入口網站傳給家人朋友</h3>
+    <p>將分享「心星機場接送」入口官網（介紹頁），不是這張預約表。朋友點進去後可自行預約。</p>
     <button type="button" id="shareNative" class="close-x" style="margin-top:8px;">📤 開啟分享選單</button>
     <button type="button" class="close-x" id="btnCloseShareModal" data-close="shareModal" onclick="window.__closePopup && window.__closePopup('shareModal'); return false;" style="background:#e5e7eb;color:#374151;margin-top:8px;">關閉</button>
   </div>
@@ -931,8 +931,8 @@ window.__closePopup = function(id) {
         </button>
         <button type="button" id="btnShare" title="把預約網站分享給家人朋友">
           <span class="util-ico" aria-hidden="true">🔗</span>
-          <span class="util-title">傳給家人朋友</span>
-          <span class="util-sub">開啟手機分享選單</span>
+          <span class="util-title">分享入口網站</span>
+          <span class="util-sub">傳官網給家人朋友</span>
         </button>
       </div>
     </div>
@@ -1943,9 +1943,17 @@ window.__closePopup = function(id) {
 
     // 加到主畫面 / 分享
     (function() {
-      function siteUrl() { return location.href.split('#')[0]; }
+      function homeUrl() {
+        try {
+          var u = new URL('.', location.href);
+          return u.href;
+        } catch (e) {
+          return location.origin + '/';
+        }
+      }
+      function siteUrl() { return homeUrl(); }
       function siteText() {
-        return '💝心星⭐️機場接送｜機場接送／包車旅遊線上預約\n' + siteUrl();
+        return '💝心星⭐️機場接送｜全台機場接送／包車旅遊，服務有價、專人報價。\n' + homeUrl();
       }
       function showModal(id) { window.__openPopup(id); }
       function hideModal(id) { window.__closePopup(id); }
@@ -2020,7 +2028,7 @@ window.__closePopup = function(id) {
           var data = {
             title: '💝心星⭐️機場接送',
             text: '全台機場接送／包車旅遊，服務有價、專人報價。',
-            url: siteUrl()
+            url: homeUrl()
           };
           if (navigator.share) {
             navigator.share(data).catch(function(err){
@@ -2050,7 +2058,7 @@ window.__closePopup = function(id) {
           var data = {
             title: '💝心星⭐️機場接送',
             text: '全台機場接送／包車旅遊，服務有價、專人報價。',
-            url: siteUrl()
+            url: homeUrl()
           };
           if (navigator.share) {
             navigator.share(data).then(function(){ hideModal('shareModal'); }).catch(function(err){
