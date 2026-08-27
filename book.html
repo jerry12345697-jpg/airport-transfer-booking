@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="心星機場接送">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>機場接送｜包車旅遊｜訂製預約｜心星接送</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18372863823"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-18372863823');
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+      transition: background 0.6s ease;
+    }
+    body.theme-ready {
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: inherit;
+      z-index: -2;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.28);
+      z-index: -1;
+      pointer-events: none;
+    }
+    .season-banner {
+      max-width: 640px;
+      margin: 8px auto 16px;
+      text-align: center;
+      color: #fffef7;
+      padding: 18px 20px 16px;
+      line-height: 1.6;
+      position: relative;
+      /* 與背景融合的詩意字卡 */
+      background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.28) 100%);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+      backdrop-filter: blur(2px);
+    }
+    .season-banner .season-title {
+      display: block;
+      font-family: "Ma Shan Zheng", "Zhi Mang Xing", "楷體", "楷体", serif;
+      font-size: clamp(1.75rem, 5vw, 2.35rem);
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-shadow:
+        0 2px 8px rgba(0,0,0,0.65),
+        0 0 24px rgba(0,0,0,0.35);
+      margin-bottom: 6px;
+      line-height: 1.35;
+    }
+    .season-banner .season-desc {
+      display: block;
+      font-family: "Zhi Mang Xing", "Ma Shan Zheng", "楷體", "楷体", serif;
+      font-size: clamp(1rem, 3.2vw, 1.25rem);
+      letter-spacing: 0.08em;
+      opacity: 0.95;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.7);
+      font-weight: 400;
+    }
+    .zodiac-card {
+      max-width: 640px;
+      margin: 0 auto 14px;
+      background: rgba(255,255,255,0.92);
+      border-radius: 14px;
+      padding: 12px 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #333;
+    }
+    .zodiac-card h3 {
+      font-size: 0.95rem;
+      color: #1e3c72;
+      margin-bottom: 6px;
+    }
+    .zodiac-card .zodiac-today {
+      color: #b45309;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .zodiac-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 10px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    .zodiac-list span { color: #555; }
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.97);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .header h1 { font-size: 1.45rem; margin-bottom: 6px; }
+    .header p { opacity: 0.9; font-size: 0.92rem; }
+    .form-section { padding: 24px; }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.92rem;
+      color: #222;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid #d0d7de;
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-bottom: 14px;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #2a5298;
+    }
+    .row { display: flex; gap: 12px; }
+    .row > div { flex: 1; }
+    .seat-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .seat-row label { margin: 0; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+    .seat-row input[type="checkbox"] { width: auto; margin: 0; }
+    .seat-row select {
+      width: 70px;
+      margin: 0;
+      padding: 6px 8px;
+      display: none;
+    }
+    .seat-row select.show { display: inline-block; }
+    .fee-tag { color: #b45309; font-size: 0.85rem; font-weight: 500; }
+    .hint { font-size: 0.82rem; color: #666; margin-top: -8px; margin-bottom: 12px; }
+    .cny-warn {
+      display: none;
+      color: #dc2626;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin: 10px 0;
+      padding: 10px;
+      background: #fef2f2;
+      border-radius: 8px;
+      border: 1px solid #fecaca;
+    }
+    .summary-box {
+      background: #f8fafc;
+      border: 2px solid #2a5298;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 16px 0;
+      font-size: 0.95rem;
+      line-height: 1.75;
+    }
+    .summary-box h3 {
+      color: #1e3c72;
+      margin-bottom: 10px;
+      font-size: 1.05rem;
+    }
+    button[type="submit"] {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; }
+    .success {
+      display: none;
+      background: #e6f9ed;
+      border: 2px solid #22c55e;
+      color: #166534;
+      padding: 24px;
+      border-radius: 12px;
+      text-align: center;
+      margin-top: 16px;
+    }
+    .footer {
+      text-align: center;
+      padding: 14px;
+      font-size: 0.8rem;
+      color: #888;
+      background: #f8fafc;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 16px;
+      max-width: 520px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+      padding: 24px 20px;
+    }
+    .modal h2 {
+      color: #1e3c72;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .modal .step {
+      background: #fff8e6;
+      border: 1px solid #f59e0b;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.92rem;
+      margin-bottom: 14px;
+      line-height: 1.55;
+    }
+    .modal .copy-box {
+      background: #f8fafc;
+      border: 1.5px solid #d0d7de;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 280px;
+      overflow-y: auto;
+      margin-bottom: 14px;
+    }
+    .modal .btn-row { display: flex; flex-direction: column; gap: 10px; }
+    .modal .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-copy {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+    }
+    .btn-line {
+      background: #06C755;
+      color: #fff;
+      text-decoration: none;
+      text-align: center;
+      display: block;
+      line-height: 1.2;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+    .btn-close {
+      background: #f0f4f8;
+      color: #333;
+    }
+    .copied-tip {
+      display: none;
+      text-align: center;
+      color: #166534;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .line-link { color: #06C755; }
+    @media (max-width: 520px) {
+      .row { flex-direction: column; gap: 0; }
+    }
+  
+    /* 進站必讀 */
+    .terms-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(15, 32, 39, 0.92);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .terms-overlay.hidden { display: none; }
+    .terms-box {
+      background: #fff; border-radius: 16px;
+      max-width: 560px; width: 100%;
+      max-height: 90vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .terms-box h2 {
+      padding: 18px 20px 8px;
+      font-size: 1.15rem; color: #1e3c72; text-align: center;
+    }
+    .terms-hint {
+      text-align: center; font-size: 0.85rem; color: #b45309;
+      padding: 0 16px 8px;
+    }
+    .terms-scroll {
+      flex: 1; overflow-y: auto;
+      padding: 12px 20px 20px;
+      font-size: 0.88rem; line-height: 1.7; color: #333;
+      border-top: 1px solid #eee; border-bottom: 1px solid #eee;
+    }
+    .terms-scroll h3 { color: #1e3c72; margin: 14px 0 8px; font-size: 1rem; }
+    .terms-scroll ol { padding-left: 1.3em; }
+    .terms-scroll li { margin-bottom: 6px; }
+    .terms-actions {
+      padding: 14px 20px 18px;
+    }
+    .terms-actions label {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-weight: 500; font-size: 0.9rem; margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .terms-actions input[type="checkbox"] { width: auto; margin-top: 3px; }
+    .captcha-row {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 12px; flex-wrap: wrap;
+    }
+    .captcha-row input {
+      width: 80px; margin: 0; padding: 8px;
+    }
+    .terms-actions button {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff; border: none; border-radius: 12px;
+      font-size: 1.05rem; font-weight: 700; cursor: pointer;
+    }
+    .terms-actions button:disabled {
+      background: #cbd5e1; cursor: not-allowed;
+    }
+    .hp-field { position: absolute; left: -9999px; opacity: 0; height: 0; overflow: hidden; }
+    .container.locked { display: none; }
+
+
+    .zodiac-float {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      width: 200px;
+      z-index: 90;
+      background: rgba(255,255,255,0.95);
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.22);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.6);
+      backdrop-filter: blur(8px);
+    }
+    .zodiac-float-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .zodiac-float-head button {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: #fff;
+      width: 26px; height: 26px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+    }
+    .zodiac-float-body { padding: 10px 10px 12px; }
+    .zodiac-float-note {
+      font-size: 0.72rem;
+      color: #888;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .zodiac-chips {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .zodiac-chips a {
+      display: block;
+      text-align: center;
+      padding: 7px 4px;
+      font-size: 0.78rem;
+      text-decoration: none;
+      color: #1e3c72;
+      background: #f0f5ff;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .zodiac-chips a:hover {
+      background: #dbe7ff;
+      transform: translateY(-1px);
+    }
+    .zodiac-float.collapsed .zodiac-float-body { display: none; }
+    @media (max-width: 720px) {
+      .zodiac-float {
+        right: 10px;
+        bottom: 12px;
+        width: 168px;
+      }
+      .zodiac-chips a { font-size: 0.72rem; padding: 6px 2px; }
+    }
+    @media (max-width: 720px) {
+      .music-player {
+        left: 10px;
+        bottom: 12px;
+        width: 180px;
+        padding: 10px;
+      }
+    }
+
+
+    .win-btns { display: flex; gap: 4px; }
+    .win-btn {
+      width: 26px; height: 26px; border: none; border-radius: 8px;
+      background: #e8eef7; color: #1e3c72; font-size: 1rem; line-height: 1;
+      cursor: pointer; font-weight: 700; padding: 0;
+    }
+    .win-btn.light {
+      background: rgba(255,255,255,0.22); color: #fff;
+    }
+    .music-player.collapsed .mp-body { display: none; }
+    .zodiac-float.collapsed .zodiac-float-body { display: none; }
+    .fab-music, .fab-zodiac {
+      position: fixed; z-index: 91;
+      width: 44px; height: 44px; border-radius: 50%;
+      border: none; cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      font-size: 1.2rem;
+      background: #fff;
+    }
+    .fab-music { left: 16px; bottom: 20px; }
+    .fab-zodiac { right: 16px; bottom: 20px; }
+    .music-player .mp-title { display: flex; justify-content: space-between; align-items: center; }
+
+
+    .zodiac-fortunes {
+      max-height: 280px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: #333;
+    }
+    .zodiac-fortunes .zf-item {
+      padding: 8px 6px;
+      border-bottom: 1px solid #eef2f7;
+    }
+    .zodiac-fortunes .zf-item:last-child { border-bottom: none; }
+    .zodiac-fortunes .zf-sign {
+      font-weight: 700;
+      color: #1e3c72;
+      margin-bottom: 2px;
+    }
+    .zodiac-float {
+      width: 230px;
+    }
+    @media (max-width: 720px) {
+      .zodiac-float { width: 200px; }
+      .zodiac-fortunes { max-height: 220px; font-size: 0.74rem; }
+    }
+
+
+    .visit-counter {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 80;
+      background: rgba(255,255,255,0.92);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      color: #444;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.7);
+      backdrop-filter: blur(6px);
+      display: none;
+    }
+    .visit-counter .vc-num {
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin: 0 2px;
+      background: linear-gradient(90deg, #f59e0b, #ec4899, #8b5cf6, #3b82f6, #10b981);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: vcShine 3s linear infinite;
+    }
+    @keyframes vcShine {
+      to { background-position: 200% center; }
+    }
+    .visit-top {
+      text-align: center;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.95);
+      margin-top: 8px;
+      letter-spacing: 0.02em;
+    }
+    .visit-top .vc-num {
+      font-weight: 800;
+      font-size: 1.15rem;
+      background: linear-gradient(90deg, #fde68a, #f9a8d4, #c4b5fd, #93c5fd, #6ee7b7);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: vcShine 3s linear infinite;
+    }
+
+  
+    .util-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin: 16px 0 8px;
+      padding: 12px 8px 4px;
+    }
+    .util-btns button, .util-btns a.util-btn {
+      font-family: inherit;
+      border: 2px solid #fff;
+      background: linear-gradient(145deg, #ffffff 0%, #ffe4f3 100%);
+      color: #9d174d;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-width: 150px;
+      max-width: 220px;
+      flex: 1 1 150px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.22), 0 0 0 3px rgba(255,255,255,0.25);
+      line-height: 1.25;
+      text-align: center;
+      animation: utilPulse 2.2s ease-in-out infinite;
+    }
+    .util-btns button:hover, .util-btns a.util-btn:hover {
+      background: linear-gradient(145deg, #fff 0%, #ffc2e0 100%);
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+    }
+    .util-btns .util-ico {
+      font-size: 1.85rem;
+      line-height: 1;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.12));
+    }
+    .util-btns .util-title {
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+    }
+    .util-btns .util-sub {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #be185d;
+      opacity: 0.9;
+    }
+    @keyframes utilPulse {
+      0%, 100% { box-shadow: 0 6px 18px rgba(0,0,0,0.22), 0 0 0 3px rgba(255,255,255,0.25); }
+      50% { box-shadow: 0 8px 22px rgba(255,255,255,0.35), 0 0 0 5px rgba(255,255,255,0.4); }
+    }
+    .util-guide {
+      text-align: center;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin: 0 0 2px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+      opacity: 0.95;
+    }
+    .round-block {
+      display: none;
+      margin: 12px 0;
+      padding: 14px;
+      border: 2px solid #f9a8d4;
+      border-radius: 12px;
+      background: #fff7fb;
+    }
+    .round-block.show { display: block; }
+    .round-block h3 {
+      margin: 0 0 10px;
+      color: #be185d;
+      font-size: 1rem;
+    }
+    .time-hint {
+      font-size: 0.78rem;
+      color: #b45309;
+      background: #fff7ed;
+      border-left: 3px solid #f59e0b;
+      padding: 8px 10px;
+      margin: 6px 0 12px;
+      border-radius: 0 8px 8px 0;
+      line-height: 1.45;
+    }
+/* modal styles unified under .popup-overlay */
+
+
+  
+    .share-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0 8px;
+    }
+    .share-grid a, .share-grid button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 14px 8px;
+      border-radius: 12px;
+      border: 1px solid #fbcfe8;
+      background: #fff;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #831843;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .share-grid a:hover, .share-grid button:hover {
+      background: #fdf2f8;
+      border-color: #f472b6;
+    }
+    .share-grid .ico { font-size: 1.6rem; line-height: 1; }
+    .share-url {
+      width: 100%;
+      font-size: 0.75rem;
+      padding: 8px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-top: 8px;
+      word-break: break-all;
+      box-sizing: border-box;
+    }
+
+  
+    .popup-overlay {
+      display: none !important;
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: rgba(0,0,0,0.65);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+    .popup-overlay.show {
+      display: flex !important;
+    }
+    .popup-overlay .box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 22px;
+      max-width: 420px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      line-height: 1.55;
+      font-size: 0.92rem;
+      position: relative;
+      z-index: 10000;
+      pointer-events: auto;
+    }
+    .popup-overlay .close-x {
+      margin-top: 14px;
+      width: 100%;
+      border: none;
+      background: linear-gradient(135deg,#f472b6,#c026d3);
+      color: #fff;
+      font-weight: 700;
+      padding: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1rem;
+      pointer-events: auto;
+    }
+    .btn-new-trip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin-top: 10px;
+      padding: 14px 16px;
+      border: 2px dashed #f9a8d4;
+      border-radius: 12px;
+      background: #fff7fb;
+      color: #be185d;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-new-trip:hover {
+      background: #fce7f3;
+      border-style: solid;
+    }
+
+  </style>
+</head>
+<body>
+
+<div id="appInstallModal" class="popup-overlay" aria-hidden="true">
+  <div class="box" role="dialog">
+    <h3>📲 變成不用下載的 APP</h3>
+    <p>把本站加到手機<strong>主畫面</strong>後，之後可像 APP 一樣一點即開。</p>
+    <p><strong>iPhone（請用 Safari）</strong></p>
+    <ol>
+      <li>點底部分享 <strong>□↑</strong></li>
+      <li>選 <strong>「加入主畫面」</strong></li>
+      <li>按 <strong>「加入」</strong></li>
+    </ol>
+    <p><strong>Android（Chrome）</strong></p>
+    <ol>
+      <li>點右上角 <strong>⋮</strong></li>
+      <li>選 <strong>安裝應用程式</strong> 或 <strong>加到主畫面</strong></li>
+    </ol>
+    <p><strong>電腦</strong>：Ctrl+D 或 ⌘+D 加入書籤</p>
+    <button type="button" class="close-x" id="btnCloseAppModal" data-close="appInstallModal" onclick="window.__closePopup && window.__closePopup('appInstallModal'); return false;">我知道了</button>
+  </div>
+</div>
+
+<div id="shareModal" class="popup-overlay" aria-hidden="true">
+  <div class="box" role="dialog">
+    <h3>🔗 分享給好友</h3>
+    <p>選擇要分享的方式：</p>
+    <div class="share-grid">
+      <a id="shareLine" href="#" target="_blank" rel="noopener"><span class="ico">💬</span>LINE</a>
+      <a id="shareWhatsApp" href="#" target="_blank" rel="noopener"><span class="ico">🟢</span>WhatsApp</a>
+      <a id="shareMessenger" href="#" target="_blank" rel="noopener"><span class="ico">💙</span>Messenger</a>
+      <a id="shareFB" href="#" target="_blank" rel="noopener"><span class="ico">📘</span>Facebook</a>
+      <button type="button" id="shareWeChat"><span class="ico">🟢</span>微信（複製）</button>
+      <button type="button" id="shareNative"><span class="ico">📤</span>系統分享</button>
+      <button type="button" id="shareCopy"><span class="ico">📋</span>複製連結</button>
+      <button type="button" id="shareSMS"><span class="ico">短信</span>簡訊</button>
+    </div>
+    <input class="share-url" id="shareUrlBox" readonly>
+    <p id="shareTip" style="display:none;color:#059669;font-weight:700;margin-top:8px;"></p>
+    <button type="button" class="close-x" id="btnCloseShareModal" data-close="shareModal" onclick="window.__closePopup && window.__closePopup('shareModal'); return false;">關閉</button>
+  </div>
+</div>
+
+
+  <!-- 進站必讀：注意事項＋防機器人 -->
+  <div class="terms-overlay" id="termsOverlay">
+    <div class="terms-box">
+      <h2>💝心星⭐️機場接送<br>請先閱讀注意事項與免責聲明</h2>
+      <p class="terms-hint">請滑動至最底部後，勾選同意並完成驗證，始可預約</p>
+      <div class="terms-scroll" id="termsScroll">
+        <h3>一、消費者注意事項</h3>
+        <ol>
+          <li>本表單僅供填寫接送／包車需求，<strong>送出或產生摘要不代表訂單已成立</strong>。</li>
+          <li>請確認摘要內容無誤後，<strong>自行複製並貼至官方 LINE 帳號</strong>，專人收到後始進入報價程序。</li>
+          <li>未貼至官方 LINE、或資料不全者，可能無法報價或聯繫。</li>
+          <li><strong>實際車資以專人報價並經雙方確認為準</strong>；網頁或口頭預估僅供參考。</li>
+          <li>夜間（約 22:00–06:00）、過年期間、偏遠地區、停靠點、大型行李、安全座椅、舉牌等，<strong>可能另計費用</strong>。</li>
+          <li>請盡早預約；臨時、尖峰、疏運期間可能無車可派。</li>
+          <li>出發前請再確認：時間、上下車地點、航班、人數與行李。</li>
+          <li>航班延誤、取消或改時間，請儘早透過 LINE／電話通知，以便調整。</li>
+          <li>乘車請依約定時間到達；逾時等候是否加價，以當次約定為準。</li>
+          <li><strong>航站免費等候時間</strong>：接機免費等候為 <strong>60 分鐘</strong>，自<strong>航班實際落地時間起算</strong>；超過 60 分鐘將另行產生等候費用，以當次報價或雙方確認為準。請下機後儘速通關、取行李並至約定會合點。</li>
+          <li>貴重物品請自行妥善保管；特殊行李請事先註明。</li>
+          <li><strong>兒童安全座椅（重要）</strong>：<strong>未滿 3 歲之兒童應依規定使用合格安全座椅</strong>。請於預約時勾選並加購。未事先加購致無法合法載運時，司機依法不得載送，<strong>本服務將不予履約出車</strong>；相關損失由預約方自行負擔。司機違規可能面臨罰則，故無法在無安全座椅情況下出車。</li>
+          <li>服務範圍與車型以當次可派遣車輛為準，必要時可能協調調整。</li>
+          <li>聯繫與報價請盡量透過<strong>官方 LINE</strong>。</li>
+          <li>行程中請遵守交通規則與司機安全提醒。</li>
+        </ol>
+        <h3>二、免責聲明</h3>
+        <ol>
+          <li>報價、時間與路線受路況、天氣、管制、事故、航班異動等影響，<strong>無法保證完全準點或與預估完全一致</strong>。</li>
+          <li>因不可抗力（天災、疫情、法令、機場關閉、嚴重塞車等）導致延誤、取消或變更，將盡力協助，惟不負擔超出約定範圍之損害賠償。</li>
+          <li>乘客因自身原因（遲到、資料錯誤、未接聽電話、未至約定地點、通關／取行李逾時、超過航站免費等候 60 分鐘、未為未滿 3 歲兒童加購安全座椅等）所生等候、空跑、取消或不履約，相關費用或損失由乘客／預約方負擔。</li>
+          <li>因未為未滿 3 歲兒童加購或提供符合規定之安全座椅致無法合法出車者，原因在預約方，本公司／司機不負強制出車義務及因此衍生之損害賠償責任。</li>
+          <li>車內遺失物請盡速聯繫；非因司機故意或重大過失造成之遺失、毀損，恕難負完全責任。</li>
+          <li>乘客車內行為、與第三人之糾紛或違反法令之行為，由乘客自行負責。</li>
+          <li>未完成報價確認、未約定付款與出發細節前，雙方均無強制出車義務。</li>
+          <li>網頁內容若有調整，以當下頁面與官方 LINE 回覆為準。</li>
+          <li>本聲明之解釋與爭議，以中華民國法律為準，並以服務所在地有管轄權之法院為第一審管轄法院。</li>
+        </ol>
+        <p style="margin-top:16px;color:#666;font-size:0.85rem;">— 文末 — 請繼續滑動並於下方確認 —</p>
+      </div>
+      <div class="terms-actions">
+        <input type="text" id="hpCompany" class="hp-field" tabindex="-1" autocomplete="off" placeholder="company">
+        <label>
+          <input type="checkbox" id="termsAgree" disabled>
+          <span>我已完整閱讀並同意上述注意事項與免責聲明</span>
+        </label>
+        <div class="captcha-row">
+          <span>防機器人驗證：<strong id="captchaQ"></strong> = </span>
+          <input type="number" id="captchaA" placeholder="答案" inputmode="numeric">
+        </div>
+        <button type="button" id="termsEnter" disabled>同意並開始預約</button>
+        <p id="termsErr" style="color:#dc2626;font-size:0.85rem;margin-top:8px;display:none;"></p>
+      </div>
+    </div>
+  </div>
+<div class="season-banner" id="seasonBanner" style="display:none;"></div>
+  <div class="visit-counter" id="visitCounter">已到站 <span class="vc-num" id="visitNum">—</span> 次瀏覽</div>
+  <!-- 右側星座運勢小框 -->
+  <div class="zodiac-float" id="zodiacFloat" style="display:none;">
+    <div class="zodiac-float-head">
+      <span>✨ 今日運勢</span>
+      <span class="win-btns">
+        <button type="button" class="win-btn light" id="zodiacToggle" title="縮小">－</button>
+        <button type="button" class="win-btn light" id="zodiacClose" title="關閉">×</button>
+      </span>
+    </div>
+    <div class="zodiac-float-body" id="zodiacFloatBody">
+      <p class="zodiac-float-note" id="zodiacDateNote">今日十二星座運勢（可捲動）</p>
+      <div class="zodiac-fortunes" id="zodiacFortunes"></div>
+    </div>
+  </div>
+  <button type="button" class="fab-zodiac" id="zodiacFab" style="display:none;" title="開啟運勢">✨</button>
+
+  <div class="container locked" id="mainApp">
+    <div class="header">
+      <h1>💝心星⭐️機場接送</h1>
+      <p style="margin:8px 0 0;"><a href="index.html" style="color:#fff;font-weight:800;text-decoration:underline;">← 回首頁介紹</a></p>
+      <p class="visit-top" id="visitTop" style="display:none;">本站已服務瀏覽 <span class="vc-num" id="visitNumTop">—</span> 次</p>
+      <p>填寫需求 → 確認摘要 → 送出後由專人報價回覆</p>
+      <p class="util-guide">👇 推薦先做這兩件事，預約更方便</p>
+      <div class="util-btns">
+        <button type="button" id="btnAddApp" title="加入主畫面，像 APP 一點即開">
+          <span class="util-ico" aria-hidden="true">📲</span>
+          <span class="util-title">變成免下載 APP</span>
+          <span class="util-sub">加到主畫面／書籤</span>
+        </button>
+        <button type="button" id="btnShare" title="把預約網站分享給家人朋友">
+          <span class="util-ico" aria-hidden="true">🔗</span>
+          <span class="util-title">分享給好友</span>
+          <span class="util-sub">一鍵傳連結給家人</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <form id="bookingForm">
+        <label>客戶姓名 *</label>
+        <input type="text" id="name" required placeholder="請輸入真實姓名" oninput="updateSummary()">
+
+        <label>手機號碼 *</label>
+        <input type="tel" id="phone" required placeholder="09xxxxxxxx" oninput="updateSummary()">
+
+        <label>LINE ID（方便聯繫｜官方：<a class="line-link" href="https://lin.ee/XI6z6T8" target="_blank">lin.ee/XI6z6T8</a>）</label>
+        <input type="text" id="lineId" placeholder="您的 LINE ID" oninput="updateSummary()">
+
+        <label>服務類型 *</label>
+        <select id="serviceType" required onchange="onServiceTypeChange();updateSummary()">
+          <option value="送機">送機</option>
+          <option value="接機">接機</option>
+          <option value="送機+接機（來回）">送機+接機（來回）</option>
+          <option value="包車旅遊">包車旅遊</option>
+          <option value="點對點接駁">點對點接駁</option>
+        </select>
+
+        <div id="singleRouteExtras">
+        <label>出發點地址 *</label>
+        <input type="text" id="fromAddress" required placeholder="完整地址或地標" oninput="updateSummary()">
+        <label style="font-weight:500;color:#666;">若無法清楚描述請補充</label>
+        <input type="text" id="fromAddressNote" placeholder="路口、門牌、landmark 等" oninput="updateSummary()">
+
+        <label>停靠點 1（選填）</label>
+        <input type="text" id="stop1" placeholder="中途停靠地點" oninput="updateSummary()">
+        <input type="text" id="stop1Note" placeholder="補充說明" oninput="updateSummary()">
+
+        <label>停靠點 2（選填）</label>
+        <input type="text" id="stop2" placeholder="中途停靠地點" oninput="updateSummary()">
+        <input type="text" id="stop2Note" placeholder="補充說明" oninput="updateSummary()">
+
+        <label>目的地 *</label>
+        <input type="text" id="toAddress" required placeholder="完整地址、機場或地標" oninput="updateSummary()">
+        <label style="font-weight:500;color:#666;">若無法清楚描述請補充</label>
+        <input type="text" id="toAddressNote" placeholder="航廈門口、landmark 等" oninput="updateSummary()">
+
+        <label>機場航廈（如適用）</label>
+        <select id="terminal" onchange="updateSummary()">
+          <option value="">非機場服務可空白</option>
+          <option value="松山機場國內線">松山機場國內線</option>
+          <option value="松山機場國際線">松山機場國際線</option>
+          <option value="桃園機場第一航廈">桃園機場第一航廈</option>
+          <option value="桃園機場第二航廈">桃園機場第二航廈</option>
+          <option value="桃園機場第三航廈">桃園機場第三航廈</option>
+          <option value="清泉岡機場">清泉岡機場</option>
+          <option value="高雄小港機場">高雄小港機場</option>
+        </select>
+
+        <label>航班編號（選填）</label>
+        <input type="text" id="flightNo" placeholder="例如：CI123 / BR856" oninput="updateSummary()">
+
+        </div><!-- end singleRouteExtras -->
+        <div id="singleTripBlock">
+        <div class="row">
+          <div>
+            <label>日期 *</label>
+            <input type="date" id="date" required onchange="updateSummary()">
+          </div>
+          <div>
+            <label id="labelFlightTime">航班起飛時間</label>
+            <input type="time" id="flightTime" onchange="updateSummary()">
+          </div>
+        </div>
+
+        <label id="labelPickupTime">預計出發時間 *</label>
+        <input type="time" id="pickupTime" required onchange="updateSummary()">
+        <div class="time-hint" id="timeHintSend">
+          <strong>送機建議提前抵達機場：</strong>北部約提前 <strong>3 小時</strong>、中部約 <strong>4 小時</strong>、南部約 <strong>6 小時</strong>（含路程與航廈報到／安檢時間，實際請依航班與路況調整）。此欄請填「司機接到您、預計出發」的時間。
+        </div>
+        <div class="time-hint" id="timeHintPick" style="display:none;">
+          <strong>接機請填「航班落地時間」</strong>。航站免費等候自航班落地起算 60 分鐘；逾時可能另計費用。夜間 22:00–06:00 可能加收夜間費用。
+        </div>
+        <p class="hint">夜間時段 22:00–06:00 可能加收費用，實際以報價為準</p>
+        </div>
+
+        <!-- 來回：送機 + 接機 兩段 -->
+        <div class="round-block" id="roundTripBlock">
+          <h3>✈️ 送機行程</h3>
+          <div class="row">
+            <div>
+              <label>送機日期 *</label>
+              <input type="date" id="sendDate" onchange="updateSummary()">
+            </div>
+            <div>
+              <label>預計出發時間 *</label>
+              <input type="time" id="sendTime" onchange="updateSummary()">
+            </div>
+          </div>
+          <div class="time-hint">
+            送機建議：北部提前約 3 小時、中部約 4 小時、南部約 6 小時抵達機場。請填「預計出發時間」。
+          </div>
+          <label>送機出發地址 *</label>
+          <input type="text" id="sendFrom" placeholder="住家或上車地點" oninput="updateSummary()">
+          <label>送機目的地（機場／航廈）*</label>
+          <input type="text" id="sendTo" placeholder="例如：桃園機場第一航廈" oninput="updateSummary()">
+          <label>送機航班編號（選填）</label>
+          <input type="text" id="sendFlight" placeholder="例如：CI123" oninput="updateSummary()">
+          <label>送機－航班起飛時間（選填）</label>
+          <input type="time" id="sendFlightTime" onchange="updateSummary()">
+
+          <h3 style="margin-top:18px;">🛬 接機行程</h3>
+          <div class="row">
+            <div>
+              <label>接機日期 *</label>
+              <input type="date" id="pickDate" onchange="updateSummary()">
+            </div>
+            <div>
+              <label>航班落地時間 *</label>
+              <input type="time" id="pickTime" onchange="updateSummary()">
+            </div>
+          </div>
+          <div class="time-hint">
+            接機請填航班落地時間；免費等候自落地起算 60 分鐘。
+          </div>
+          <label>接機出發（機場／航廈）*</label>
+          <input type="text" id="pickFrom" placeholder="例如：桃園機場第二航廈" oninput="updateSummary()">
+          <label>接機目的地（送達地址）*</label>
+          <input type="text" id="pickTo" placeholder="住家或目的地完整地址" oninput="updateSummary()">
+          <label>接機航班編號（選填）</label>
+          <input type="text" id="pickFlight" placeholder="例如：BR856" oninput="updateSummary()">
+        </div>
+
+        <div id="cnyWarning" class="cny-warn">
+          ⚠️ 您選擇的日期落在過年期間，可能加收費用，實際以專人報價為準
+        </div>
+
+        <div class="row">
+          <div>
+            <label>乘客人數 *</label>
+            <select id="passengers" required onchange="updateSummary()">
+              <option value="1">1 人</option>
+              <option value="2">2 人</option>
+              <option value="3">3 人</option>
+              <option value="4">4 人</option>
+              <option value="5">5 人</option>
+              <option value="6">6 人</option>
+              <option value="7">7 人</option>
+              <option value="8">8 人</option>
+              <option value="9">9 人</option>
+            </select>
+          </div>
+          <div>
+            <label>行李件數</label>
+            <select id="luggage" onchange="updateSummary()">
+              <option value="0">0 件</option>
+              <option value="1">1 件</option>
+              <option value="2">2 件</option>
+              <option value="3">3 件</option>
+              <option value="4">4 件</option>
+              <option value="5">5 件</option>
+              <option value="6">6 件以上</option>
+            </select>
+          </div>
+        </div>
+
+        <label>行李尺寸（勾選後可選數量）</label>
+        <div class="seat-row">
+          <label><input type="checkbox" id="lugCabin" onchange="toggleQty('lugCabin','qtyCabin');updateSummary()"> 登機箱（約20吋）</label>
+          <select id="qtyCabin" onchange="updateSummary()"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+        </div>
+        <div class="seat-row">
+          <label><input type="checkbox" id="lugMedium" onchange="toggleQty('lugMedium','qtyMedium');updateSummary()"> 中型行李箱（約24吋）</label>
+          <select id="qtyMedium" onchange="updateSummary()"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+        </div>
+        <div class="seat-row">
+          <label><input type="checkbox" id="lugLarge" onchange="toggleQty('lugLarge','qtyLarge');updateSummary()"> 大型行李箱（約28–29吋）</label>
+          <select id="qtyLarge" onchange="updateSummary()"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+        </div>
+        <div class="seat-row">
+          <label><input type="checkbox" id="lugSpecial" onchange="toggleQty('lugSpecial','qtySpecial');updateSummary()"> 特殊行李（嬰兒車／球具／樂器等）</label>
+          <select id="qtySpecial" onchange="updateSummary()"><option>1</option><option>2</option><option>3</option></select>
+        </div>
+
+        <label>車型需求</label>
+        <select id="vehicle" onchange="updateSummary()">
+          <option value="5人座">5人座轎車／休旅車</option>
+          <option value="7-9人座">7–9人座廂型車</option>
+          <option value="尚未決定">尚未決定，請協助建議</option>
+        </select>
+        <p class="hint">大型行李較多或人數較多時，建議選擇較大車型，實際以專人評估為準</p>
+
+        <label>兒童安全座椅／增高墊 <span class="fee-tag">（可能另計費用）</span></label>
+        <div class="seat-row">
+          <label><input type="checkbox" id="seatForward" onchange="toggleQty('seatForward','qtyForward');updateSummary()"> 正向安全座椅</label>
+          <select id="qtyForward" onchange="updateSummary()"><option>1</option><option>2</option><option>3</option></select>
+        </div>
+        <div class="seat-row">
+          <label><input type="checkbox" id="seatRear" onchange="toggleQty('seatRear','qtyRear');updateSummary()"> 反向安全座椅</label>
+          <select id="qtyRear" onchange="updateSummary()"><option>1</option><option>2</option><option>3</option></select>
+        </div>
+        <div class="seat-row">
+          <label><input type="checkbox" id="seatBooster" onchange="toggleQty('seatBooster','qtyBooster');updateSummary()"> 增高墊</label>
+          <select id="qtyBooster" onchange="updateSummary()"><option>1</option><option>2</option><option>3</option></select>
+        </div>
+
+        <label style="margin-top:8px;">
+          <input type="checkbox" id="signboard" style="width:auto;margin-right:6px;" onchange="updateSummary()">
+          需要舉牌接機 <span class="fee-tag">（可能另計費用）</span>
+        </label>
+
+        <label style="margin-top:14px;">備註</label>
+        <textarea id="notes" rows="2" placeholder="舉牌文字、特殊需求等" oninput="updateSummary()"></textarea>
+
+        <!-- 摘要確認區 -->
+        <div class="summary-box">
+          <h3>📋 請確認以下預約內容</h3>
+          <div id="summaryText">請填寫上方資料，摘要會自動顯示於此</div>
+        </div>
+
+        <p class="hint" style="text-align:center;margin-bottom:12px;">
+          下一步：確認摘要 → 複製 → 貼到官方 LINE，才會有專人報價
+        </p>
+
+        <button type="submit">確認內容，產生摘要</button>
+        <button type="button" class="btn-new-trip" id="btnNewTripForm">🔄 重新填寫／清空表單</button>
+      </form>
+
+      <!-- 確認視窗 -->
+      <div class="modal-overlay" id="confirmModal">
+        <div class="modal">
+          <h2>✅ 請再次確認並複製摘要</h2>
+          <div class="step">
+            <strong>請依下列步驟完成預約申請：</strong><br>
+            1. 確認下方摘要內容正確<br>
+            2. 點「複製摘要」<br>
+            3. 開啟官方 LINE 帳號並貼上傳送<br>
+            4. 專人收到後會為您報價
+          </div>
+          <div class="copied-tip" id="copiedTip">已複製到剪貼簿！請貼到官方 LINE</div>
+          <div class="copy-box" id="finalSummary"></div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-copy" id="btnCopy">📋 複製摘要並開啟官方 LINE</button>
+            <a class="btn-line" href="https://lin.ee/XI6z6T8" target="_blank" rel="noopener">💬 手機：開啟官方 LINE 貼上</a>
+            <button type="button" class="btn btn-close" id="btnCloseModal">關閉</button>
+            <button type="button" class="btn-new-trip" id="btnNewTrip">🔄 重新填寫／建立新行程</button>
+          </div>
+          <div style="margin-top:12px;padding:12px;background:#f0f7ff;border-radius:10px;font-size:0.85rem;line-height:1.6;color:#333;">
+            <strong>電腦版請這樣做：</strong><br>
+            1. 先按「複製摘要」<br>
+            2. 開啟電腦版 LINE（或網頁版）<br>
+            3. 搜尋官方帳號：<strong>心星機場接送</strong><br>
+            　　或在瀏覽器打開：<a href="https://lin.ee/XI6z6T8" target="_blank">lin.ee/XI6z6T8</a><br>
+            4. 進入聊天後「貼上」並傳送<br>
+            <span style="color:#666;">（電腦通常無法一鍵跳進 LINE App，需手動搜尋或用連結）</span>
+          </div>
+          <p style="text-align:center;font-size:0.8rem;color:#888;margin-top:12px;">
+            訂單編號：<span id="orderId">—</span><br>
+            僅複製貼上至官方帳號後，才會進入報價程序
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">💝心星⭐️機場接送 ・ 專人報價 ・ 安全準時</div>
+  </div>
+
+  <script>
+
+
+    // 瀏覽次數
+    (function() {
+      function apply(n) {
+        var a = document.getElementById('visitNum');
+        var b = document.getElementById('visitNumTop');
+        var c = document.getElementById('visitCounter');
+        var t = document.getElementById('visitTop');
+        var s = String(n);
+        if (a) a.textContent = s;
+        if (b) b.textContent = s;
+        if (c) c.style.display = 'block';
+        if (t) t.style.display = 'block';
+      }
+      fetch('/api/views')
+        .then(function(r){ return r.json(); })
+        .then(function(d){ if (d && d.total != null) apply(d.total); })
+        .catch(function(){});
+    })();
+
+    // ===== 每月台灣季節／景點背景 + 星座每日小語 =====
+    (function() {
+      const monthThemes = [
+        { // 1
+          name: '一月・冬日溫泉與山城',
+          desc: '陽明山、北投溫泉季，山嵐與暖湯的台灣冬景',
+          gradient: 'linear-gradient(160deg, #1a2744 0%, #3d5a80 45%, #98c1d9 100%)',
+          image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80'
+        },
+        {
+          name: '二月・過年燈會與春意',
+          desc: '燈會、廟口與早春花開，迎接新的一年',
+          gradient: 'linear-gradient(160deg, #4a1942 0%, #c73e1d 50%, #f4a261 100%)',
+          image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600&q=80'
+        },
+        {
+          name: '三月・櫻花與客家桐花',
+          desc: '櫻花、桐花紛飛，山林轉為柔粉與雪白',
+          gradient: 'linear-gradient(160deg, #5c4d7a 0%, #e8a0bf 50%, #fde2e4 100%)',
+          image: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1600&q=80'
+        },
+        {
+          name: '四月・踏青與海風',
+          desc: '郊山健行、海岸線微風，適合出遊的暖春',
+          gradient: 'linear-gradient(160deg, #1b4332 0%, #52b788 50%, #d8f3dc 100%)',
+          image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600&q=80'
+        },
+        {
+          name: '五月・端午與綠意',
+          desc: '滿眼新綠、粽香時節，城市與田野都醒了',
+          gradient: 'linear-gradient(160deg, #081c15 0%, #2d6a4f 50%, #95d5b2 100%)',
+          image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80'
+        },
+        {
+          name: '六月・夏至與蔚藍海岸',
+          desc: '墾丁、東北角與漁港，陽光與海的台灣夏日',
+          gradient: 'linear-gradient(160deg, #023e8a 0%, #0077b6 45%, #90e0ef 100%)',
+          image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80'
+        },
+        {
+          name: '七月・盛夏與山巔',
+          desc: '合歡山、清境與高山涼意，逃離平地暑氣',
+          gradient: 'linear-gradient(160deg, #1d3557 0%, #457b9d 50%, #a8dadc 100%)',
+          image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=80'
+        },
+        {
+          name: '八月・晚夏與夜市燈火',
+          desc: '星空、海風與夜市人情，台灣最有味道的夜晚',
+          gradient: 'linear-gradient(160deg, #3d0c11 0%, #9b2226 45%, #ee9b00 100%)',
+          image: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1600&q=80'
+        },
+        {
+          name: '九月・中秋與月色',
+          desc: '明月、茶香與秋涼，適合出遊賞月的時節',
+          gradient: 'linear-gradient(160deg, #22223b 0%, #4a4e69 50%, #c9ada7 100%)',
+          image: 'https://images.unsplash.com/photo-1532693322450-2cb5c511067d?w=1600&q=80'
+        },
+        {
+          name: '十月・秋旅與金黃',
+          desc: '落羽松、金黃稻浪與溫暖秋陽',
+          gradient: 'linear-gradient(160deg, #6b3a2a 0%, #d4a373 50%, #faedcd 100%)',
+          image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1600&q=80'
+        },
+        {
+          name: '十一月・秋末與煙波',
+          desc: '日月潭、阿里山雲海，霧氣中的詩意台灣',
+          gradient: 'linear-gradient(160deg, #2b2d42 0%, #8d99ae 50%, #edf2f4 100%)',
+          image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600&q=80'
+        },
+        {
+          name: '十二月・耶誕與暖冬',
+          desc: '城市燈飾、溫泉與跨年氣氛，為一年畫下溫柔句點',
+          gradient: 'linear-gradient(160deg, #1b1464 0%, #6c3483 50%, #f5b7b1 100%)',
+          image: 'https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=1600&q=80'
+        }
+      ];
+
+      // 套用本月背景（含十二月）
+      const now = new Date();
+      const m = now.getMonth();
+      const theme = monthThemes[m] || monthThemes[0];
+
+      document.body.style.background = theme.gradient;
+      document.body.style.backgroundAttachment = 'fixed';
+
+      const img = new Image();
+      img.onload = function() {
+        document.body.style.backgroundImage =
+          'linear-gradient(rgba(15,20,40,0.42), rgba(15,20,40,0.5)), url(\'' + theme.image + '\')';
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center center';
+        document.body.style.backgroundRepeat = 'no-repeat';
+        document.body.style.backgroundAttachment = 'fixed';
+        document.body.classList.add('theme-ready');
+      };
+      img.onerror = function() {
+        // 圖失敗仍保留漸層（十二月深紫粉）
+        document.body.style.background = theme.gradient;
+        document.body.style.backgroundAttachment = 'fixed';
+      };
+      img.src = theme.image;
+
+      const banner = document.getElementById('seasonBanner');
+      if (banner) {
+        banner.innerHTML = '<span class="season-title">' + theme.name + '</span><span class="season-desc">' + theme.desc + '</span>';
+      }
+
+      // 右側運勢：直接顯示當日十二星座短運勢（依日期變化，免點擊）
+      const signs = ['牡羊座','金牛座','雙子座','巨蟹座','獅子座','處女座','天秤座','天蠍座','射手座','魔羯座','水瓶座','雙魚座'];
+      const tipsPool = [
+        '適合把重要行程提早確認，路上較順心。',
+        '與人溝通宜簡潔清楚，可減少誤會。',
+        '小額支出先記一筆，財務更踏實。',
+        '給自己一點緩衝時間，行程更從容。',
+        '適合聯繫久未聯絡的親友或客戶。',
+        '決策前多看一眼細節，會更安心。',
+        '今日適合規劃短途移動與接送安排。',
+        '保持彈性，突發狀況也能沉穩處理。',
+        '貴人運在服務與協助他人時出現。',
+        '身體與心情同步放慢一點更有利。',
+        '先完成最重要的一件事，效率最高。',
+        '一句善意的問候，能帶來好緣分。',
+        '出門前再核對時間與會合地點。',
+        '適合收集報價與比較方案再決定。',
+        '耐心等候的結果，往往比急躁更好。',
+        '今日宜穩紮穩打，不宜衝動變更。'
+      ];
+      const dayKey = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+      const box = document.getElementById('zodiacFortunes');
+      const note = document.getElementById('zodiacDateNote');
+      if (note) {
+        note.textContent = (now.getMonth() + 1) + '/' + now.getDate() + ' 十二星座運勢（可上下滑動）';
+      }
+      if (box) {
+        box.innerHTML = signs.map(function(s, i) {
+          const tip = tipsPool[(dayKey + i * 7) % tipsPool.length];
+          return '<div class="zf-item"><div class="zf-sign">' + s + '</div><div>' + tip + '</div></div>';
+        }).join('');
+      }
+      const toggle = document.getElementById('zodiacToggle');
+      const floatEl = document.getElementById('zodiacFloat');
+      const zClose = document.getElementById('zodiacClose');
+      const zFab = document.getElementById('zodiacFab');
+      if (toggle && floatEl) {
+        toggle.addEventListener('click', function() {
+          floatEl.classList.toggle('collapsed');
+          toggle.textContent = floatEl.classList.contains('collapsed') ? '□' : '－';
+        });
+      }
+      if (zClose && floatEl) {
+        zClose.addEventListener('click', function() {
+          floatEl.style.display = 'none';
+          floatEl.classList.remove('collapsed');
+          if (zFab) zFab.style.display = 'block';
+        });
+      }
+      if (zFab && floatEl) {
+        zFab.addEventListener('click', function() {
+          zFab.style.display = 'none';
+          floatEl.style.display = 'block';
+          floatEl.classList.remove('collapsed');
+          if (toggle) toggle.textContent = '－';
+        });
+      }
+    })();
+
+
+    const cnyRanges = [
+      ['2026-02-14', '2026-02-23'],
+      ['2027-02-04', '2027-02-14'],
+      ['2028-01-24', '2028-02-02']
+    ];
+
+    function isCnyDate(d) {
+      if (!d) return false;
+      for (let i = 0; i < cnyRanges.length; i++) {
+        if (d >= cnyRanges[i][0] && d <= cnyRanges[i][1]) return true;
+      }
+      return false;
+    }
+
+    function toggleQty(checkId, qtyId) {
+      const on = document.getElementById(checkId).checked;
+      const sel = document.getElementById(qtyId);
+      if (on) sel.classList.add('show');
+      else sel.classList.remove('show');
+    }
+
+    function qtyText(checkId, qtyId, label) {
+      if (!document.getElementById(checkId).checked) return '';
+      return label + 'x' + document.getElementById(qtyId).value;
+    }
+
+    function getLuggageDetail() {
+      return [
+        qtyText('lugCabin', 'qtyCabin', '登機箱'),
+        qtyText('lugMedium', 'qtyMedium', '中型箱'),
+        qtyText('lugLarge', 'qtyLarge', '大型箱'),
+        qtyText('lugSpecial', 'qtySpecial', '特殊行李')
+      ].filter(Boolean).join('、') || '無特別註記';
+    }
+
+    function getSeatDetail() {
+      return [
+        qtyText('seatForward', 'qtyForward', '正向安全座椅'),
+        qtyText('seatRear', 'qtyRear', '反向安全座椅'),
+        qtyText('seatBooster', 'qtyBooster', '增高墊')
+      ].filter(Boolean).join('、') || '無';
+    }
+
+
+    function isRoundTrip() {
+      return document.getElementById('serviceType').value === '送機+接機（來回）';
+    }
+
+    function onServiceTypeChange() {
+      const st = document.getElementById('serviceType').value;
+      const single = document.getElementById('singleTripBlock');
+      const round = document.getElementById('roundTripBlock');
+      const labelPick = document.getElementById('labelPickupTime');
+      const labelFlight = document.getElementById('labelFlightTime');
+      const hintSend = document.getElementById('timeHintSend');
+      const hintPick = document.getElementById('timeHintPick');
+      const pickup = document.getElementById('pickupTime');
+      const dateEl = document.getElementById('date');
+      const fromEl = document.getElementById('fromAddress');
+      const toEl = document.getElementById('toAddress');
+
+      const extras = document.getElementById('singleRouteExtras');
+      if (st === '送機+接機（來回）') {
+        if (single) single.style.display = 'none';
+        if (extras) extras.style.display = 'none';
+        if (round) round.classList.add('show');
+        // 單趟必填改非必填，避免來回時被擋
+        if (pickup) pickup.required = false;
+        if (dateEl) dateEl.required = false;
+        if (fromEl) fromEl.required = false;
+        if (toEl) toEl.required = false;
+      } else {
+        if (single) single.style.display = 'block';
+        if (extras) extras.style.display = 'block';
+        if (round) round.classList.remove('show');
+        if (pickup) pickup.required = true;
+        if (dateEl) dateEl.required = true;
+        if (fromEl) fromEl.required = true;
+        if (toEl) toEl.required = true;
+
+        if (st === '送機') {
+          if (labelPick) labelPick.textContent = '預計出發時間 *';
+          if (labelFlight) labelFlight.textContent = '航班起飛時間（選填，供對照）';
+          if (hintSend) hintSend.style.display = 'block';
+          if (hintPick) hintPick.style.display = 'none';
+        } else if (st === '接機') {
+          if (labelPick) labelPick.textContent = '航班落地時間 *';
+          if (labelFlight) labelFlight.textContent = '其他參考時間（選填）';
+          if (hintSend) hintSend.style.display = 'none';
+          if (hintPick) hintPick.style.display = 'block';
+        } else {
+          if (labelPick) labelPick.textContent = '出發時間（司機抵達／出發）*';
+          if (labelFlight) labelFlight.textContent = '參考時間（選填）';
+          if (hintSend) hintSend.style.display = 'none';
+          if (hintPick) hintPick.style.display = 'none';
+        }
+      }
+    }
+
+    function updateSummary() {
+      const st0 = document.getElementById('serviceType').value;
+      const date = st0 === '送機+接機（來回）'
+        ? (document.getElementById('sendDate').value || document.getElementById('pickDate').value || '—')
+        : (document.getElementById('date').value || '—');
+      const cnyEl = document.getElementById('cnyWarning');
+      if (cnyEl) {
+        const d2 = document.getElementById('pickDate') ? document.getElementById('pickDate').value : '';
+        cnyEl.style.display = (isCnyDate(date) || isCnyDate(d2)) ? 'block' : 'none';
+      }
+
+      const from = document.getElementById('fromAddress').value.trim() || '—';
+      const fromNote = document.getElementById('fromAddressNote').value.trim();
+      const stop1 = document.getElementById('stop1').value.trim();
+      const stop2 = document.getElementById('stop2').value.trim();
+      const to = document.getElementById('toAddress').value.trim() || '—';
+      const toNote = document.getElementById('toAddressNote').value.trim();
+
+      let fromLine = from + (fromNote ? '（' + fromNote + '）' : '');
+      if (stop1) fromLine += '<br>　停靠1：' + stop1 + (document.getElementById('stop1Note').value.trim() ? '（' + document.getElementById('stop1Note').value.trim() + '）' : '');
+      if (stop2) fromLine += '<br>　停靠2：' + stop2 + (document.getElementById('stop2Note').value.trim() ? '（' + document.getElementById('stop2Note').value.trim() + '）' : '');
+      let toLine = to + (toNote ? '（' + toNote + '）' : '');
+
+      const pickup = document.getElementById('pickupTime').value || '—';
+      let nightNote = '';
+      if (pickup && pickup !== '—') {
+        const h = parseInt(pickup.split(':')[0], 10);
+        if (h >= 22 || h < 6) nightNote = '（落在夜間時段 22:00–06:00）';
+      }
+
+      const html =
+        (st0 === '送機+接機（來回）' ? '' : ('<strong>日期：</strong>' + date + (isCnyDate(date) ? ' <span style="color:#dc2626;">（過年期間）</span>' : '') + '<br>')) +
+        '<strong>聯絡人：</strong>' + (document.getElementById('name').value.trim() || '—') + '<br>' +
+        '<strong>聯絡電話：</strong>' + (document.getElementById('phone').value.trim() || '—') + '<br>' +
+        '<strong>LINE ID：</strong>' + (document.getElementById('lineId').value.trim() || '—') + '<br>' +
+        '<strong>服務類型：</strong>' + document.getElementById('serviceType').value + '<br>' +
+        (function(){
+          const st = document.getElementById('serviceType').value;
+          if (st === '送機+接機（來回）') {
+            return (
+              '<strong>【送機】</strong><br>' +
+              '　日期：' + (document.getElementById('sendDate').value || '—') + '<br>' +
+              '　預計出發時間：' + (document.getElementById('sendTime').value || '—') + '<br>' +
+              '　出發：' + (document.getElementById('sendFrom').value.trim() || '—') + '<br>' +
+              '　目的地：' + (document.getElementById('sendTo').value.trim() || '—') + '<br>' +
+              '　航班：' + (document.getElementById('sendFlight').value.trim() || '—') +
+                '　起飛：' + (document.getElementById('sendFlightTime').value || '—') + '<br>' +
+              '<strong>【接機】</strong><br>' +
+              '　日期：' + (document.getElementById('pickDate').value || '—') + '<br>' +
+              '　航班落地時間：' + (document.getElementById('pickTime').value || '—') + '<br>' +
+              '　機場出發：' + (document.getElementById('pickFrom').value.trim() || '—') + '<br>' +
+              '　送達：' + (document.getElementById('pickTo').value.trim() || '—') + '<br>' +
+              '　航班：' + (document.getElementById('pickFlight').value.trim() || '—') + '<br>'
+            );
+          }
+          const timeLabel = st === '接機' ? '航班落地時間' : (st === '送機' ? '預計出發時間' : '出發時間');
+          const flightLabel = st === '接機' ? '其他參考時間' : '航班起飛時間';
+          return (
+            '<strong>' + timeLabel + '：</strong>' + pickup + ' ' + nightNote + '<br>' +
+            '<strong>' + flightLabel + '：</strong>' + (document.getElementById('flightTime').value || '—') + '<br>' +
+            '<strong>出發地點：</strong>' + fromLine + '<br>' +
+            '<strong>目的地：</strong>' + toLine + '<br>'
+          );
+        })() +
+        '<strong>航廈：</strong>' + (document.getElementById('terminal').value || '—') + '<br>' +
+        '<strong>航班編號：</strong>' + (document.getElementById('flightNo').value.trim() || '—') + '<br>' +
+        '<strong>人數：</strong>' + document.getElementById('passengers').value + ' 人<br>' +
+        '<strong>行李數：</strong>' + document.getElementById('luggage').value + ' 件（' + getLuggageDetail() + '）<br>' +
+        '<strong>車型：</strong>' + document.getElementById('vehicle').value + '<br>' +
+        '<strong>安全座椅／增高墊：</strong>' + getSeatDetail() + '<br>' +
+        '<strong>舉牌接機：</strong>' + (document.getElementById('signboard').checked ? '需要' : '不需要') + '<br>' +
+        '<strong>備註：</strong>' + (document.getElementById('notes').value.trim() || '無');
+
+      document.getElementById('summaryText').innerHTML = html;
+    }
+
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+    function todayStr() {
+      const d = new Date();
+      return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+    }
+    function nowTimeStr() {
+      const d = new Date();
+      return pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+    function validateDateTime() {
+      if (isRoundTrip()) return true;
+      const dateEl = document.getElementById('date');
+      const timeEl = document.getElementById('pickupTime');
+      const dateVal = dateEl.value;
+      const timeVal = timeEl.value;
+      const today = todayStr();
+      if (!dateVal) return true;
+      if (dateVal < today) {
+        alert('日期錯誤：不能選擇過去的日期，請重新選擇。');
+        dateEl.value = '';
+        updateSummary();
+        return false;
+      }
+      if (dateVal === today && timeVal) {
+        if (timeVal < nowTimeStr()) {
+          alert('時間錯誤：出發時間不能早於現在，請重新選擇。');
+          timeEl.value = '';
+          updateSummary();
+          return false;
+        }
+      }
+      // 航班起飛時間若有填且與出發同一天，僅提醒不強制
+      return true;
+    }
+
+    document.getElementById('date').min = todayStr();
+    ['sendDate','pickDate'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.min = todayStr();
+    });
+    document.getElementById('date').addEventListener('change', function() {
+      validateDateTime();
+      updateSummary();
+    });
+    document.getElementById('pickupTime').addEventListener('change', function() {
+      validateDateTime();
+      updateSummary();
+    });
+    updateSummary();
+    onServiceTypeChange();
+
+    function buildPlainSummary(orderId) {
+      const date = document.getElementById('date').value || '—';
+      const pickup = document.getElementById('pickupTime').value || '—';
+      let nightNote = '';
+      if (pickup && pickup !== '—') {
+        const h = parseInt(pickup.split(':')[0], 10);
+        if (h >= 22 || h < 6) nightNote = '（夜間時段 22:00–06:00）';
+      }
+      const from = document.getElementById('fromAddress').value.trim() || '—';
+      const fromNote = document.getElementById('fromAddressNote').value.trim();
+      const stop1 = document.getElementById('stop1').value.trim();
+      const stop1Note = document.getElementById('stop1Note').value.trim();
+      const stop2 = document.getElementById('stop2').value.trim();
+      const stop2Note = document.getElementById('stop2Note').value.trim();
+      const to = document.getElementById('toAddress').value.trim() || '—';
+      const toNote = document.getElementById('toAddressNote').value.trim();
+
+      let lines = [];
+      lines.push('【心星機場接送｜預約需求】');
+      lines.push('訂單編號：' + (orderId || '—'));
+      lines.push('────────');
+      if (document.getElementById('serviceType').value !== '送機+接機（來回）') {
+        lines.push('日期：' + date + (isCnyDate(date) ? '（過年期間）' : ''));
+      }
+      lines.push('聯絡人：' + (document.getElementById('name').value.trim() || '—'));
+      lines.push('聯絡電話：' + (document.getElementById('phone').value.trim() || '—'));
+      lines.push('LINE ID：' + (document.getElementById('lineId').value.trim() || '—'));
+      const st = document.getElementById('serviceType').value;
+      lines.push('服務類型：' + st);
+      if (st === '送機+接機（來回）') {
+        lines.push('【送機行程】');
+        lines.push('送機日期：' + (document.getElementById('sendDate').value || '—') + (isCnyDate(document.getElementById('sendDate').value) ? '（過年期間）' : ''));
+        lines.push('預計出發時間：' + (document.getElementById('sendTime').value || '—'));
+        lines.push('送機出發：' + (document.getElementById('sendFrom').value.trim() || '—'));
+        lines.push('送機目的地：' + (document.getElementById('sendTo').value.trim() || '—'));
+        lines.push('送機航班：' + (document.getElementById('sendFlight').value.trim() || '—'));
+        lines.push('送機起飛時間：' + (document.getElementById('sendFlightTime').value || '—'));
+        lines.push('【接機行程】');
+        lines.push('接機日期：' + (document.getElementById('pickDate').value || '—') + (isCnyDate(document.getElementById('pickDate').value) ? '（過年期間）' : ''));
+        lines.push('航班落地時間：' + (document.getElementById('pickTime').value || '—'));
+        lines.push('接機機場出發：' + (document.getElementById('pickFrom').value.trim() || '—'));
+        lines.push('接機送達：' + (document.getElementById('pickTo').value.trim() || '—'));
+        lines.push('接機航班：' + (document.getElementById('pickFlight').value.trim() || '—'));
+      } else {
+        const timeLabel = st === '接機' ? '航班落地時間' : (st === '送機' ? '預計出發時間' : '出發時間');
+        const flightLabel = st === '接機' ? '其他參考時間' : '航班起飛時間';
+        lines.push(timeLabel + '：' + pickup + ' ' + nightNote);
+        lines.push(flightLabel + '：' + (document.getElementById('flightTime').value || '—'));
+        lines.push('出發地點：' + from + (fromNote ? '（' + fromNote + '）' : ''));
+        if (stop1) lines.push('停靠點1：' + stop1 + (stop1Note ? '（' + stop1Note + '）' : ''));
+        if (stop2) lines.push('停靠點2：' + stop2 + (stop2Note ? '（' + stop2Note + '）' : ''));
+        lines.push('目的地：' + to + (toNote ? '（' + toNote + '）' : ''));
+        lines.push('航廈：' + (document.getElementById('terminal').value || '—'));
+        lines.push('航班編號：' + (document.getElementById('flightNo').value.trim() || '—'));
+      }
+      lines.push('人數：' + document.getElementById('passengers').value + ' 人');
+      lines.push('行李：' + document.getElementById('luggage').value + ' 件（' + getLuggageDetail() + '）');
+      lines.push('車型：' + document.getElementById('vehicle').value);
+      lines.push('安全座椅／增高墊：' + getSeatDetail());
+      lines.push('舉牌接機：' + (document.getElementById('signboard').checked ? '需要' : '不需要'));
+      lines.push('備註：' + (document.getElementById('notes').value.trim() || '無'));
+      lines.push('────────');
+      lines.push('請協助報價，謝謝。');
+      return lines.join('\n');
+    }
+
+    document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (isRoundTrip()) {
+        const need = [
+          ['sendDate','送機日期'],['sendTime','送機預計出發時間'],['sendFrom','送機出發地址'],['sendTo','送機目的地'],
+          ['pickDate','接機日期'],['pickTime','航班落地時間'],['pickFrom','接機機場'],['pickTo','接機送達地址']
+        ];
+        for (const [id, lab] of need) {
+          const v = (document.getElementById(id).value || '').trim();
+          if (!v) { alert('請填寫：' + lab); document.getElementById(id).focus(); return; }
+        }
+      } else {
+        if (!validateDateTime()) return;
+      }
+      const dateVal = document.getElementById('date').value || document.getElementById('sendDate').value || '';
+      const timeVal = document.getElementById('pickupTime').value || document.getElementById('sendTime').value || '';
+      if (!dateVal || !timeVal) {
+        alert('請填寫日期與出發時間');
+        return;
+      }
+      if (dateVal < todayStr()) {
+        alert('日期錯誤：不能選擇過去的日期');
+        return;
+      }
+      if (dateVal === todayStr() && timeVal < nowTimeStr()) {
+        alert('時間錯誤：出發時間不能早於現在');
+        return;
+      }
+      const btn = this.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = '處理中...';
+
+      const data = {
+        name: document.getElementById('name').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        lineId: document.getElementById('lineId').value.trim(),
+        serviceType: document.getElementById('serviceType').value,
+        fromAddress: document.getElementById('fromAddress').value.trim(),
+        fromAddressNote: document.getElementById('fromAddressNote').value.trim(),
+        stop1: document.getElementById('stop1').value.trim(),
+        stop1Note: document.getElementById('stop1Note').value.trim(),
+        stop2: document.getElementById('stop2').value.trim(),
+        stop2Note: document.getElementById('stop2Note').value.trim(),
+        toAddress: document.getElementById('toAddress').value.trim(),
+        toAddressNote: document.getElementById('toAddressNote').value.trim(),
+        terminal: document.getElementById('terminal').value,
+        flightNo: document.getElementById('flightNo').value.trim(),
+        date: document.getElementById('date').value,
+        flightTime: document.getElementById('flightTime').value,
+        pickupTime: document.getElementById('pickupTime').value,
+        passengers: document.getElementById('passengers').value,
+        luggage: document.getElementById('luggage').value,
+        luggageSizes: getLuggageDetail(),
+        vehicle: document.getElementById('vehicle').value,
+        seats: getSeatDetail(),
+        signboard: document.getElementById('signboard').checked,
+        notes: document.getElementById('notes').value.trim(),
+        cny: isCnyDate(document.getElementById('date').value)
+      };
+
+      let orderId = 'AT' + Date.now().toString().slice(-8);
+      let visitCount = 0;
+      let isReturning = false;
+
+      // 嘗試存檔並累計客戶預約次數
+      try {
+        const res = await fetch('/api/booking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (result.success && result.orderId) orderId = result.orderId;
+        if (result.visitCount) visitCount = result.visitCount;
+        if (result.isReturning) isReturning = true;
+      } catch (err) {
+        console.log('save optional fail', err);
+      }
+
+      let plain = buildPlainSummary(orderId);
+      if (visitCount > 0) {
+        plain = plain.replace(
+          '────────\n',
+          '────────\n預約次數：第 ' + visitCount + ' 次' + (isReturning ? '（回流客戶）' : '') + '\n'
+        );
+        // 若格式不同再補在開頭附近
+        if (plain.indexOf('預約次數') < 0) {
+          plain = plain.replace(
+            '訂單編號：' + orderId,
+            '訂單編號：' + orderId + '\n預約次數：第 ' + visitCount + ' 次' + (isReturning ? '（回流客戶）' : '')
+          );
+        }
+      }
+      document.getElementById('finalSummary').textContent = plain;
+      document.getElementById('orderId').textContent = orderId;
+      document.getElementById('confirmModal').classList.add('show');
+      document.getElementById('copiedTip').style.display = 'none';
+      btn.disabled = false;
+      btn.textContent = '確認內容，產生摘要';
+    });
+
+    document.getElementById('btnCopy').addEventListener('click', function() {
+      const text = document.getElementById('finalSummary').textContent;
+      const lineUrl = 'https://lin.ee/XI6z6T8';
+
+      function openLine() {
+        // 新分頁開啟官方帳號（手機常會轉進 LINE App）
+        window.open(lineUrl, '_blank');
+      }
+
+      function ok() {
+        document.getElementById('copiedTip').style.display = 'block';
+        document.getElementById('copiedTip').textContent = '已複製！正在開啟官方 LINE，請在聊天室貼上傳送';
+        openLine();
+      }
+
+      function fallbackCopy() {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+        ok();
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(ok).catch(fallbackCopy);
+      } else {
+        fallbackCopy();
+      }
+    });
+
+    document.getElementById('btnCloseModal').addEventListener('click', function() {
+      document.getElementById('confirmModal').classList.remove('show');
+    });
+
+    // ===== 進站必讀 + 防機器人 =====
+    (function() {
+      const overlay = document.getElementById('termsOverlay');
+      const scrollEl = document.getElementById('termsScroll');
+      const agree = document.getElementById('termsAgree');
+      const btn = document.getElementById('termsEnter');
+      const main = document.getElementById('mainApp');
+      const err = document.getElementById('termsErr');
+      let scrolledBottom = false;
+      const n1 = Math.floor(Math.random() * 8) + 2;
+      const n2 = Math.floor(Math.random() * 8) + 1;
+      document.getElementById('captchaQ').textContent = n1 + ' + ' + n2;
+      window.__captchaAns = n1 + n2;
+      const pageOpenAt = Date.now();
+
+      function checkReady() {
+        const okScroll = scrolledBottom;
+        const okAgree = agree.checked;
+        const ans = parseInt(document.getElementById('captchaA').value, 10);
+        const okCap = ans === window.__captchaAns;
+        btn.disabled = !(okScroll && okAgree && okCap);
+      }
+
+      scrollEl.addEventListener('scroll', function() {
+        const el = scrollEl;
+        if (el.scrollTop + el.clientHeight >= el.scrollHeight - 20) {
+          scrolledBottom = true;
+          agree.disabled = false;
+        }
+        checkReady();
+      });
+
+      // 內容過短時仍可標記（保險）
+      setTimeout(function() {
+        if (scrollEl.scrollHeight <= scrollEl.clientHeight + 5) {
+          scrolledBottom = true;
+          agree.disabled = false;
+          checkReady();
+        }
+      }, 500);
+
+      agree.addEventListener('change', checkReady);
+      document.getElementById('captchaA').addEventListener('input', checkReady);
+
+      btn.addEventListener('click', function() {
+        err.style.display = 'none';
+        // 蜜罐：機器人常會填
+        if (document.getElementById('hpCompany').value) {
+          err.textContent = '驗證失敗，請重試';
+          err.style.display = 'block';
+          return;
+        }
+        // 開啟後過短時間就送出，疑似機器人
+        if (Date.now() - pageOpenAt < 2500) {
+          err.textContent = '請確實閱讀後再繼續';
+          err.style.display = 'block';
+          return;
+        }
+        if (!scrolledBottom || !agree.checked) {
+          err.textContent = '請滑動至文末並勾選同意';
+          err.style.display = 'block';
+          return;
+        }
+        if (parseInt(document.getElementById('captchaA').value, 10) !== window.__captchaAns) {
+          err.textContent = '驗證題答案錯誤';
+          err.style.display = 'block';
+          return;
+        }
+        overlay.classList.add('hidden');
+        main.classList.remove('locked');
+        var sb = document.getElementById('seasonBanner');
+        var zf = document.getElementById('zodiacFloat');
+        if (sb) sb.style.display = 'block';
+        if (zf) zf.style.display = 'block';
+        try { sessionStorage.setItem('termsOk', '1'); } catch(e) {}
+      });
+
+      // 同セッション已同意可跳過（重新整理仍需閱讀可拿掉這段）
+      // 依需求：每次進入都要閱讀，故不自動跳過
+    })();
+
+  
+
+    // 加到主畫面 / 分享（事件委派，關閉鈕一定有效）
+    (function() {
+      function siteUrl() { return location.href.split('#')[0]; }
+      function siteText() {
+        return '💝心星⭐️機場接送｜機場接送／包車旅遊線上預約\n' + siteUrl();
+      }
+      function showModal(id) {
+        if (window.__openPopup) return window.__openPopup(id);
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.style.display = 'flex';
+        el.classList.add('show');
+        el.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+      function hideModal(id) {
+        if (window.__closePopup) return window.__closePopup(id);
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove('show');
+        el.style.display = 'none';
+        el.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+      function hideAllPopups() {
+        hideModal('shareModal');
+        hideModal('appInstallModal');
+      }
+
+      // 委派：關閉按鈕 data-close
+      document.addEventListener('click', function(e) {
+        var t = e.target;
+        if (!t) return;
+        // 點遮罩關閉
+        if (t.id === 'shareModal' || t.id === 'appInstallModal') {
+          hideModal(t.id);
+          return;
+        }
+        var closer = t.closest ? t.closest('[data-close]') : null;
+        if (closer) {
+          e.preventDefault();
+          hideModal(closer.getAttribute('data-close'));
+          return;
+        }
+        if (t.id === 'btnAddApp' || (t.closest && t.closest('#btnAddApp'))) {
+          e.preventDefault();
+          if (window._deferredPrompt) {
+            try {
+              window._deferredPrompt.prompt();
+              window._deferredPrompt.userChoice.then(function(){ window._deferredPrompt = null; });
+              return;
+            } catch (err) {}
+          }
+          showModal('appInstallModal');
+          return;
+        }
+        if (t.id === 'btnShare' || (t.closest && t.closest('#btnShare'))) {
+          e.preventDefault();
+          var url = siteUrl();
+          var text = siteText();
+          var box = document.getElementById('shareUrlBox');
+          if (box) box.value = url;
+          var tip = document.getElementById('shareTip');
+          if (tip) { tip.style.display = 'none'; tip.textContent = ''; }
+
+          var line = document.getElementById('shareLine');
+          if (line) line.href = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(url);
+
+          var wa = document.getElementById('shareWhatsApp');
+          if (wa) wa.href = 'https://wa.me/?text=' + encodeURIComponent(text);
+
+          // Messenger 分享（m.me 需 page，改用 facebook messenger send dialog 通用）
+          var ms = document.getElementById('shareMessenger');
+          if (ms) ms.href = 'fb-messenger://share/?link=' + encodeURIComponent(url);
+
+          var fb = document.getElementById('shareFB');
+          if (fb) fb.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+
+          var sms = document.getElementById('shareSMS');
+          if (sms) {
+            sms.onclick = function(ev) {
+              ev.preventDefault();
+              location.href = 'sms:?&body=' + encodeURIComponent(text);
+            };
+          }
+          showModal('shareModal');
+          return;
+        }
+        if (t.id === 'shareCopy' || (t.closest && t.closest('#shareCopy'))) {
+          e.preventDefault();
+          var url = siteUrl();
+          var tip = document.getElementById('shareTip');
+          function ok() {
+            if (tip) { tip.style.display = 'block'; tip.textContent = '✅ 已複製連結'; }
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(ok).catch(function(){
+              var box = document.getElementById('shareUrlBox');
+              if (box) { box.focus(); box.select(); try { document.execCommand('copy'); ok(); } catch(e) {} }
+            });
+          } else {
+            var box = document.getElementById('shareUrlBox');
+            if (box) { box.focus(); box.select(); try { document.execCommand('copy'); ok(); } catch(e) { prompt('請複製：', url); } }
+          }
+          return;
+        }
+        if (t.id === 'shareNative' || (t.closest && t.closest('#shareNative'))) {
+          e.preventDefault();
+          var data = { title: '💝心星⭐️機場接送', text: '機場接送／包車旅遊線上預約', url: siteUrl() };
+          if (navigator.share) {
+            navigator.share(data).catch(function(err){
+              if (err && err.name === 'AbortError') return;
+              alert('系統分享無法使用，請改用 LINE／WhatsApp 或複製連結。');
+            });
+          } else {
+            alert('此瀏覽器不支援系統分享。\n請改用 LINE、WhatsApp，或按「複製連結」後貼到其他 App。');
+          }
+          return;
+        }
+        if (t.id === 'shareWeChat' || (t.closest && t.closest('#shareWeChat'))) {
+          e.preventDefault();
+          var url = siteUrl();
+          var tip = document.getElementById('shareTip');
+          function done() {
+            if (tip) {
+              tip.style.display = 'block';
+              tip.innerHTML = '✅ 連結已複製<br>請開啟<strong>微信</strong>→選好友→長按貼上傳送<br>（微信不允許網頁直接開啟分享）';
+            }
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(done).catch(done);
+          } else { done(); }
+          return;
+        }
+        if (t.id === 'btnNewTrip' || t.id === 'btnNewTripForm' || (t.closest && (t.closest('#btnNewTrip') || t.closest('#btnNewTripForm')))) {
+          e.preventDefault();
+          if (!confirm('確定要清空表單並重新填寫新行程嗎？')) return;
+          var form = document.getElementById('bookingForm');
+          if (form) form.reset();
+          // 還原預設 UI
+          try {
+            document.querySelectorAll('.seat-row select').forEach(function(s){ s.classList.remove('show'); });
+            var cm = document.getElementById('confirmModal');
+            if (cm) cm.classList.remove('show');
+            if (typeof onServiceTypeChange === 'function') onServiceTypeChange();
+            if (typeof updateSummary === 'function') updateSummary();
+          } catch (err) {}
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          alert('已清空，可以開始填寫新行程。');
+          return;
+        }
+      });
+
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        window._deferredPrompt = e;
+      });
+
+      // ESC 關閉
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') hideAllPopups();
+      });
+    })();
+
+    
+    // 直接綁定關閉（雙重保險）
+    (function(){
+      function bindClose(btnId, modalId) {
+        var b = document.getElementById(btnId);
+        if (!b) return;
+        b.onclick = function(e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          window.__closePopup(modalId);
+          return false;
+        };
+      }
+      bindClose('btnCloseAppModal', 'appInstallModal');
+      bindClose('btnCloseShareModal', 'shareModal');
+    })();
+
+    try { onServiceTypeChange(); } catch (e) {}
+
+  </script>
+
+</body>
+</html>
