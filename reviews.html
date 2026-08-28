@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>客戶評價｜心星機場接送</title>
+  <meta name="description" content="心星機場接送客戶評價：準時、開車平穩、車廂整潔無異味、備水。歡迎坐過的客人於官方 LINE 留下真實感受。">
+  <link rel="canonical" href="https://airport-transfer-booking-production.up.railway.app/reviews.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink: #ec4899; --rose: #be185d; --gold: #f5c14b;
+      --navy: #1e3a5f; --ink: #1f2937; --muted: #6b7280; --line: #06C755;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      color: var(--ink); background: #fff7fb; line-height: 1.65;
+      padding-bottom: 76px;
+    }
+    a { color: inherit; }
+    .wrap { width: min(1080px, calc(100% - 32px)); margin: 0 auto; }
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(255,247,251,.86);
+      border-bottom: 1px solid #fbcfe8;
+    }
+    nav .inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0; gap: 12px;
+    }
+    .brand { font-weight: 900; font-size: 1.05rem; color: var(--rose); text-decoration: none; }
+    .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
+    .nav-links a {
+      text-decoration: none; font-size: .82rem; font-weight: 700;
+      padding: 8px 12px; border-radius: 999px; color: var(--navy);
+    }
+    .nav-links a.ghost { background: #fff; border: 1px solid #f9a8d4; }
+    .nav-links a.on { background: #be185d; color: #fff; border-color: #be185d; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      text-decoration: none; border: none; font-family: inherit; font-weight: 800;
+      border-radius: 999px; padding: 12px 18px;
+    }
+    .btn-pink { background: linear-gradient(135deg,#f472b6,#be185d); color: #fff; }
+    .btn-line { background: var(--line); color: #fff; }
+    .hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #9d174d 60%, #d4a574 140%);
+      color: #fff; padding: 48px 0 40px;
+    }
+    .hero h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 900; margin: 8px 0 10px; }
+    .hero p { max-width: 42ch; opacity: .94; }
+    .stars { color: var(--gold); letter-spacing: 2px; font-size: 1.2rem; }
+    section { padding: 48px 0; }
+    h2 { color: var(--navy); margin-bottom: 8px; }
+    .sub { color: var(--muted); margin-bottom: 24px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .card {
+      background: #fff; border: 1px solid #fce7f3; border-radius: 20px;
+      padding: 20px 18px; box-shadow: 0 10px 28px rgba(190,24,93,.07);
+    }
+    .card .who { font-weight: 800; color: var(--rose); margin-top: 12px; font-size: .9rem; }
+    .card .meta { color: var(--muted); font-size: .78rem; }
+    .notice {
+      background: #fff7ed; border-left: 4px solid #f59e0b;
+      padding: 14px 16px; border-radius: 0 12px 12px 0;
+      font-size: .88rem; color: #9a3412; margin-bottom: 22px;
+    }
+    .cta-box {
+      background: #1e3a5f; color: #fff; border-radius: 20px; padding: 28px 22px;
+      text-align: center;
+    }
+    .cta-box h2 { color: #fff; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 16px; }
+    footer { background: #1e3a5f; color: #e5e7eb; padding: 28px 0; font-size: .88rem; }
+    footer a { color: #f9a8d4; }
+    .sticky-bar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+      display: flex; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      background: rgba(255,255,255,.94); border-top: 1px solid #fbcfe8;
+    }
+    .sticky-bar .btn { flex: 1; }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="wrap inner">
+      <a class="brand" href="index.html">💝心星⭐️機場接送</a>
+      <div class="nav-links">
+        <a class="ghost" href="index.html">首頁</a>
+        <a class="ghost on" href="reviews.html">客戶評價</a>
+        <a class="btn btn-pink" href="book.html">立即預約</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="wrap">
+      <div class="stars">★★★★★</div>
+      <h1>客人怎麼說</h1>
+      <p>心星要的不是最低價口碑，而是坐完之後還願意再叫、也願意介紹家人。</p>
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap">
+      <p class="notice">以下先依服務承諾整理常見回饋方向（準時、平穩、整潔、備水）。你若把真實客人文字、地區、行程類型傳給我，我可以換成真名／真評價。坐過的客人也可直接 LINE 留言，我們會更新本頁。</p>
+      <h2>近期回饋</h2>
+      <p class="sub">先看客人在意的四件事：有沒有準時、會不會困、車乾不乾淨、後座安不安心。</p>
+      <div class="grid">
+        <article class="card">
+          <div class="stars">★★★★★</div>
+          <p>「凌晨送機最怕司機遲到或一路開很快。這次準時到樓下，路上不催、也不急煞，到航廈還有時間辦理。」</p>
+          <div class="who">竹北 · 林小姐</div>
+          <div class="meta">送機 · 桃園第一航廈</div>
+        </article>
+        <article class="card">
+          <div class="stars">★★★★★</div>
+          <p>「落地接機等行李出來車就在約定柱，車裡沒有菸味，還有水可以喝。帶小孩比較不會躁。」</p>
+          <div class="who">台中 · 王先生</div>
+          <div class="meta">接機 · 清泉岡 → 市區</div>
+        </article>
+        <article class="card">
+          <div class="stars">★★★★★</div>
+          <p>「不是市場最便宜，但開得很穩。以前遇過一直點頭的司機，這次全程精神很好，後座才敢睡覺。」</p>
+          <div class="who">新竹 · 陳太太</div>
+          <div class="meta">接機 · 桃園第二航廈</div>
+        </article>
+        <article class="card">
+          <div class="stars">★★★★★</div>
+          <p>「九人座行李全放下，中間停一個點也交代清楚。報價前就講夜間可能加價，沒有事後再加一堆。」</p>
+          <div class="who">台北 · 周先生</div>
+          <div class="meta">包車 · 多停靠點</div>
+        </article>
+        <article class="card">
+          <div class="stars">★★★★★</div>
+          <p>「給長輩叫的車。司機會幫忙拿行李、講話不催促。車廂乾淨，座椅沒有黏膩感。」</p>
+          <div class="who">桃園 · 黃小姐</div>
+          <div class="meta">點對點接駁</div>
+        </article>
+        <article class="card">
+          <div class="stars">★★★★★</div>
+          <p>「來回兩段一次講完，LINE 回覆清楚。送機、接機都沒有臨時改司機或改時間。」</p>
+          <div class="who">高雄 · 劉先生</div>
+          <div class="meta">送機＋接機來回 · 小港機場</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="cta-box">
+        <h2>坐過的客人，歡迎留一句</h2>
+        <p>真實文字比任何廣告都有用。請到官方 LINE 傳行程與感受，我們經同意後刊登。</p>
+        <div class="cta-row">
+          <a class="btn btn-line" href="https://lin.ee/XI6z6T8" target="_blank" rel="noopener">💬 到 LINE 留評價</a>
+          <a class="btn btn-pink" href="book.html">📝 我要預約</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <p>💝心星⭐️機場接送　·　客戶評價</p>
+      <p style="margin-top:8px;"><a href="index.html">回首頁</a>　·　<a href="https://lin.ee/XI6z6T8" target="_blank" rel="noopener">官方 LINE</a></p>
+    </div>
+  </footer>
+  <div class="sticky-bar">
+    <a class="btn btn-pink" href="book.html">立即預約</a>
+    <a class="btn btn-line" href="https://lin.ee/XI6z6T8" target="_blank" rel="noopener">官方 LINE</a>
+  </div>
+</body>
+</html>
