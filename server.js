@@ -536,6 +536,30 @@ app.post('/api/reviews', function(req, res) {
   }
 });
 
+
+function checkAdmin(req) {
+  const expected = String(process.env.ADMIN_KEY || '').trim();
+  if (!expected) return false;
+  const got = String((req.body && req.body.key) || req.headers['x-admin-key'] || req.query.key || '').trim();
+  return got && got === expected;
+}
+
+app.post('/api/reviews/admin-list', function(req, res) {
+  if (!checkAdmin(req)) return res.status(401).json({ ok: false, error: '未授權，請確認 ADMIN_KEY' });
+  res.json({ ok: true, reviews: loadReviews().slice().reverse() });
+});
+
+app.post('/api/reviews/delete', function(req, res) {
+  if (!checkAdmin(req)) return res.status(401).json({ ok: false, error: '未授權，僅管理者可刪除' });
+  const id = String((req.body && req.body.id) || '').trim();
+  if (!id) return res.status(400).json({ ok: false, error: '缺少編號' });
+  const list = loadReviews();
+  const next = list.filter(function(r) { return String(r.id) !== id; });
+  if (next.length === list.length) return res.status(404).json({ ok: false, error: '找不到這則留言' });
+  saveReviews(next);
+  res.json({ ok: true });
+});
+
 app.get('/api/health', function(req, res) {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });

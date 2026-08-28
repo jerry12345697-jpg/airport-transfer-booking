@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>評價管理｜心星機場接送</title>
+  <style>
+    body { font-family: "Microsoft JhengHei", sans-serif; background:#fff7fb; color:#1f2937; margin:0; padding:24px; }
+    .box { max-width:720px; margin:0 auto; background:#fff; border-radius:16px; padding:20px; border:1px solid #fbcfe8; }
+    h1 { color:#be185d; font-size:1.2rem; }
+    input, button { font-family: inherit; padding:10px 12px; border-radius:10px; }
+    input { width:100%; border:1px solid #f9a8d4; box-sizing:border-box; }
+    button { border:none; background:#be185d; color:#fff; font-weight:800; cursor:pointer; }
+    button.del { background:#b91c1c; }
+    .item { border:1px solid #fce7f3; border-radius:12px; padding:12px; margin:10px 0; }
+    .meta { color:#6b7280; font-size:.82rem; }
+    #msg { font-weight:700; margin:8px 0; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>評價管理（僅管理者）</h1>
+    <p>請輸入 Railway 環境變數 <strong>ADMIN_KEY</strong>。此頁不會出現在首頁選單。</p>
+    <input id="key" type="password" placeholder="管理者密碼">
+    <p>
+      <button type="button" id="btnLoad">登入並載入留言</button>
+    </p>
+    <p id="msg"></p>
+    <div id="list"></div>
+    <p><a href="reviews.html">回評價頁</a></p>
+  </div>
+  <script>
+    function key() { return document.getElementById('key').value.trim(); }
+    function show(t, ok) {
+      var m = document.getElementById('msg');
+      m.style.color = ok ? '#047857' : '#b91c1c';
+      m.textContent = t;
+    }
+    function render(list) {
+      var box = document.getElementById('list');
+      if (!list.length) { box.innerHTML = '<p>目前沒有留言。</p>'; return; }
+      box.innerHTML = list.map(function(r){
+        return '<div class="item"><div>' + (r.stars||5) + '★　' +
+          (r.area||'') + ' · ' + (r.name||'') + '　' + (r.trip||'') +
+          '</div><p>' + String(r.comment||'').replace(/[<>]/g,'') + '</p>' +
+          '<div class="meta">' + (r.createdAt||'') + '　編號 ' + r.id + '</div>' +
+          '<p><button class="del" data-id="' + r.id + '">刪除這則</button></p></div>';
+      }).join('');
+      box.querySelectorAll('.del').forEach(function(b){
+        b.addEventListener('click', function(){
+          if (!confirm('確定刪除這則留言？刪除後無法復原。')) return;
+          fetch('/api/reviews/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: key(), id: b.getAttribute('data-id') })
+          }).then(function(r){ return r.json(); }).then(function(d){
+            if (!d.ok) { show(d.error || '刪除失敗', false); return; }
+            show('已刪除', true);
+            document.getElementById('btnLoad').click();
+          }).catch(function(){ show('連線失敗', false); });
+        });
+      });
+    }
+    document.getElementById('btnLoad').addEventListener('click', function(){
+      fetch('/api/reviews/admin-list', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: key() })
+      }).then(function(r){ return r.json(); }).then(function(d){
+        if (!d.ok) { show(d.error || '未授權', false); return; }
+        show('已載入 ' + d.reviews.length + ' 則', true);
+        render(d.reviews || []);
+      }).catch(function(){ show('連線失敗', false); });
+    });
+  </script>
+</body>
+</html>
