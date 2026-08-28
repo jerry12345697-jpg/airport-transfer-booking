@@ -39,6 +39,12 @@
     .sticky-bar { position:fixed; left:0; right:0; bottom:0; display:flex; gap:8px; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); background:#fff; border-top:1px solid #fbcfe8; }
     .sticky-bar .btn { flex:1; }
     .cta-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+    .stars { color:#f5c14b; letter-spacing:2px; }
+    .who { font-weight:800; color:var(--rose); margin-top:10px; font-size:.9rem; }
+    .meta { color:var(--muted); font-size:.78rem; }
+    label { font-weight:700; display:block; margin:10px 0 4px; }
+    input, select, textarea { width:100%; padding:10px; border:1px solid #f9a8d4; border-radius:10px; font-family:inherit; }
+    .notice { background:#fff7ed; border-left:4px solid #f59e0b; padding:12px 14px; border-radius:0 12px 12px 0; font-size:.88rem; color:#9a3412; margin-bottom:18px; }
   </style>
 </head>
 <body>
@@ -47,6 +53,7 @@
       <a class="brand" href="index.html">💝心星⭐️機場接送</a>
       <div class="nav-links">
         <a href="index.html">首頁</a>
+        <a href="reviews.html">評價</a>
         <a href="book.html">預約</a>
       </div>
     </div>
@@ -107,8 +114,47 @@
       </div>
       <div class="cta-row">
         <a class="btn btn-pink" href="book.html">填寫接機／送機</a>
-        <a class="btn btn-line" href="reviews.html">看評價</a>
+        <a class="btn btn-line" href="#leave-review">在本頁留言</a>
       </div>
+    </div>
+  </section>
+
+  <section id="leave-review">
+    <div class="wrap">
+      <h2>專業人士也可以直接留言</h2>
+      <p class="sub">與評價頁共用同一組留言。送出後兩頁都會顯示。</p>
+      <p class="notice">請勿填他人隱私或攻擊文字。不理智留言僅管理者可刪。</p>
+      <div class="card" style="margin-bottom:22px;">
+        <form id="reviewForm">
+          <label>怎麼稱呼</label>
+          <input id="rvName" maxlength="20" placeholder="例如：林醫師、陳律師">
+          <label>地區</label>
+          <input id="rvArea" maxlength="20" placeholder="例如：台中、新竹">
+          <label>行程</label>
+          <select id="rvTrip">
+            <option>接機</option>
+            <option>送機</option>
+            <option>送機＋接機來回</option>
+            <option>包車旅遊</option>
+            <option>點對點接駁</option>
+          </select>
+          <label>星星</label>
+          <select id="rvStars">
+            <option value="5" selected>★★★★★ 5 星</option>
+            <option value="4">★★★★ 4 星</option>
+            <option value="3">★★★ 3 星</option>
+            <option value="2">★★ 2 星</option>
+            <option value="1">★ 1 星</option>
+          </select>
+          <label>想說的話 *</label>
+          <textarea id="rvComment" required minlength="8" maxlength="300" rows="4" placeholder="例如：準時、開車平穩、車內沒有異味…"></textarea>
+          <input type="text" id="rvWebsite" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;" aria-hidden="true">
+          <p id="rvMsg" style="margin-top:8px;font-weight:700;"></p>
+          <button type="submit" class="btn btn-pink" style="margin-top:8px;">送出評價</button>
+        </form>
+      </div>
+      <h2>近期回饋</h2>
+      <div class="cards" id="reviewList"></div>
     </div>
   </section>
 
@@ -122,5 +168,51 @@
     <a class="btn btn-pink" href="book.html">立即預約</a>
     <a class="btn btn-line" href="https://lin.ee/XI6z6T8" target="_blank" rel="noopener">官方 LINE</a>
   </div>
+  <script>
+    function stars(n) { return '★'.repeat(n || 5) + '☆'.repeat(Math.max(0, 5 - (n || 5))); }
+    function cardHtml(r) {
+      return '<article class="card"><div class="stars">' + stars(r.stars) + '</div><p>「' +
+        String(r.comment || '').replace(/[<>]/g,'') +
+        '」</p><div class="who">' + (r.area || '') + ' · ' + (r.name || '客人') +
+        '</div><div class="meta">' + (r.trip || '') + '</div></article>';
+    }
+    function loadLive() {
+      fetch('/api/reviews').then(function(r){ return r.json(); }).then(function(d){
+        var box = document.getElementById('reviewList');
+        if (!box) return;
+        if (!d || !d.ok || !d.reviews || !d.reviews.length) {
+          box.innerHTML = '<p class="sub">尚無留言，歡迎成為第一則。</p>';
+          return;
+        }
+        box.innerHTML = d.reviews.map(cardHtml).join('');
+      }).catch(function(){});
+    }
+    document.getElementById('reviewForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      var msg = document.getElementById('rvMsg');
+      fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: document.getElementById('rvName').value,
+          area: document.getElementById('rvArea').value,
+          trip: document.getElementById('rvTrip').value,
+          stars: document.getElementById('rvStars').value,
+          comment: document.getElementById('rvComment').value,
+          website: document.getElementById('rvWebsite').value
+        })
+      }).then(function(r){ return r.json(); }).then(function(d){
+        if (!d.ok) { msg.style.color = '#b91c1c'; msg.textContent = d.error || '送出失敗'; return; }
+        msg.style.color = '#047857';
+        msg.textContent = '已刊登，謝謝你的回饋。';
+        document.getElementById('reviewForm').reset();
+        loadLive();
+      }).catch(function(){
+        msg.style.color = '#b91c1c';
+        msg.textContent = '送出失敗，請改傳官方 LINE。';
+      });
+    });
+    loadLive();
+  </script>
 </body>
 </html>
