@@ -1175,19 +1175,18 @@ window.__closePopup = function(id) {
       <!-- 確認視窗 -->
       <div class="modal-overlay" id="confirmModal">
         <div class="modal">
-          <h2>✅ 請再次確認並複製摘要</h2>
+          <h2>✅ 確認摘要後傳到官方 LINE</h2>
           <div class="step">
-            <strong>請依下列步驟完成預約申請：</strong><br>
-            1. 確認下方摘要內容正確<br>
-            2. 點「複製摘要」<br>
-            3. 開啟官方 LINE 帳號並貼上傳送<br>
-            4. 專人收到後會為您報價
+            <strong>不用自己逐項重打。</strong>網站已幫你整理好，只要把這份摘要傳給我們報價。<br>
+            1. 還沒加好友：先點「加入官方帳號」<br>
+            2. 已加入：點「把摘要傳到 LINE」→ 選「心星機場接送」→ 傳送<br>
+            3. 專人看到摘要後直接報價
           </div>
           <div class="copied-tip" id="copiedTip">已複製到剪貼簿！請貼到官方 LINE</div>
           <div class="copy-box" id="finalSummary"></div>
           <div class="btn-row">
-            <button type="button" class="btn btn-copy" id="btnCopy">📋 複製摘要並開啟官方 LINE</button>
-            <a class="btn-line" href="https://lin.ee/XI6z6T8" target="_blank" rel="noopener">💬 手機：開啟官方 LINE 貼上</a>
+            <button type="button" class="btn btn-copy" id="btnCopy">📤 把摘要傳到 LINE</button>
+            <a class="btn-line" href="https://lin.ee/XI6z6T8" target="_blank" rel="noopener">＋ 先加入官方帳號</a>
             <button type="button" class="btn btn-close" id="btnCloseModal">關閉</button>
             <button type="button" class="btn-new-trip" id="btnNewTrip">🔄 重新填寫／建立新行程</button>
           </div>
@@ -1822,17 +1821,24 @@ window.__closePopup = function(id) {
 
     document.getElementById('btnCopy').addEventListener('click', function() {
       const text = document.getElementById('finalSummary').textContent;
-      const lineUrl = 'https://lin.ee/XI6z6T8';
+      const addFriendUrl = 'https://lin.ee/XI6z6T8';
 
-      function openLine() {
-        // 新分頁開啟官方帳號（手機常會轉進 LINE App）
-        window.open(lineUrl, '_blank');
+      function openLineWithText() {
+        var share = 'https://line.me/R/share?text=' + encodeURIComponent(text);
+        var compose = 'https://line.me/R/msg/text/?' + encodeURIComponent(text);
+        var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '');
+        if (isMobile) {
+          location.href = compose;
+          setTimeout(function(){ window.open(share, '_blank'); }, 700);
+        } else {
+          window.open(addFriendUrl, '_blank');
+        }
       }
 
       function ok() {
         document.getElementById('copiedTip').style.display = 'block';
-        document.getElementById('copiedTip').textContent = '已複製！正在開啟官方 LINE，請在聊天室貼上傳送';
-        openLine();
+        document.getElementById('copiedTip').textContent = '摘要已複製。手機請在 LINE 選「心星機場接送」後按傳送；電腦請貼到官方帳號聊天室。';
+        openLineWithText();
       }
 
       function fallbackCopy() {
