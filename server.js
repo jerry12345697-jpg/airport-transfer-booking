@@ -481,6 +481,61 @@ app.get('/api/sheet-status', function(req, res) {
   });
 });
 
+const REVIEWS_FILE = path.join(__dirname, 'data-reviews.json');
+
+function loadReviews() {
+  try {
+    if (!fs.existsSync(REVIEWS_FILE)) return [];
+    const raw = JSON.parse(fs.readFileSync(REVIEWS_FILE, 'utf8'));
+    return Array.isArray(raw) ? raw : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveReviews(list) {
+  fs.writeFileSync(REVIEWS_FILE, JSON.stringify(list, null, 2), 'utf8');
+}
+
+app.get('/api/reviews', function(req, res) {
+  const list = loadReviews()
+    .filter(function(r) { return r && r.published !== false; })
+    .slice(-80)
+    .reverse();
+  res.json({ ok: true, reviews: list });
+});
+
+app.post('/api/reviews', function(req, res) {
+  const body = req.body || {};
+  if (body.website) return res.status(200).json({ ok: true }); // honeypot
+  const name = String(body.name || '').trim().slice(0, 20);
+  const area = String(body.area || '').trim().slice(0, 20);
+  const trip = String(body.trip || '').trim().slice(0, 30);
+  const comment = String(body.comment || '').trim().slice(0, 300);
+  const stars = Math.max(1, Math.min(5, parseInt(body.stars, 10) || 5));
+  if (!comment || comment.length < 8) {
+    return res.status(400).json({ ok: false, error: '請至少寫 8 個字' });
+  }
+  const item = {
+    id: Date.now().toString(36),
+    name: name || '匿名客人',
+    area: area || '未填地區',
+    trip: trip || '機場接送',
+    stars: stars,
+    comment: comment,
+    createdAt: new Date().toISOString(),
+    published: true
+  };
+  const list = loadReviews();
+  list.push(item);
+  try {
+    saveReviews(list);
+    res.json({ ok: true, review: item });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: '暫時無法儲存，請改用 LINE 留言' });
+  }
+});
+
 app.get('/api/health', function(req, res) {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
