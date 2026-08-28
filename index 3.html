@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>心星機場接送｜全台機場接送，台中地區專業服務</title>
+  <meta name="description" content="心星全台機場接送，台中地區專業服務。台中往返桃園機場、高雄小港機場；北部中部南部皆可預約。專人報價、車廂整潔備水。線上填表貼 LINE 確認出車。">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="心星機場接送">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink: #ec4899;
+      --rose: #be185d;
+      --gold: #f5c14b;
+      --navy: #1e3a5f;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #06C755;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      color: var(--ink);
+      background: #fff7fb;
+      line-height: 1.65;
+    }
+    a { color: inherit; }
+    .wrap { width: min(1080px, calc(100% - 32px)); margin: 0 auto; }
+
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(255,247,251,.86);
+      border-bottom: 1px solid #fbcfe8;
+    }
+    nav .inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0; gap: 12px;
+    }
+    .brand { font-weight: 900; font-size: 1.05rem; color: var(--rose); text-decoration: none; }
+    .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
+    .nav-links a {
+      text-decoration: none; font-size: .82rem; font-weight: 700;
+      padding: 8px 12px; border-radius: 999px; color: var(--navy);
+    }
+    .nav-links a.ghost { background: #fff; border: 1px solid #f9a8d4; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      text-decoration: none; border: none; cursor: pointer; font-family: inherit; font-weight: 800;
+      border-radius: 999px; padding: 12px 18px;
+    }
+    .btn-pink { background: linear-gradient(135deg,#f472b6,#be185d); color: #fff; }
+    .btn-line { background: var(--line); color: #fff; }
+    .btn-gold { background: linear-gradient(135deg,#f5c14b,#f59e0b); color: #3b2a00; }
+
+    .hero {
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(30,58,95,.35), rgba(190,24,93,.42)),
+        radial-gradient(circle at 20% 20%, #fda4af 0%, transparent 40%),
+        linear-gradient(135deg, #1e3a5f 0%, #9d174d 55%, #d4a574 140%);
+      background-color: #3b1d3a;
+      color: #fff;
+      overflow: hidden;
+      padding: 56px 0 72px;
+      transition: background 1.2s ease;
+    }
+    .hero::after {
+      content: "";
+      position: absolute; inset: auto -20% -40% 30%;
+      height: 280px;
+      background: radial-gradient(circle, rgba(245,193,75,.35), transparent 60%);
+      pointer-events: none;
+    }
+    .eyebrow {
+      display: inline-block; font-size: .78rem; letter-spacing: .18em;
+      border: 1px solid rgba(255,255,255,.4); border-radius: 999px;
+      padding: 4px 12px; margin-bottom: 14px; background: rgba(255,255,255,.1);
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 6vw, 3.3rem);
+      line-height: 1.18; font-weight: 900; max-width: 14ch;
+    }
+    .hero h1 span { color: var(--gold); }
+    .hero p.lead { margin: 16px 0 28px; max-width: 40ch; font-size: 1.05rem; opacity: .95; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    @media (min-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+    }
+    .rotator {
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 24px;
+      padding: 28px 26px 22px;
+      min-height: 220px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 16px 40px rgba(0,0,0,.18);
+    }
+    .rotator .tag {
+      font-size: .78rem;
+      letter-spacing: .16em;
+      color: var(--gold);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .rotator-text {
+      font-size: clamp(1.45rem, 3.4vw, 2.15rem);
+      font-weight: 900;
+      line-height: 1.35;
+      min-height: 4.2em;
+      color: #fff;
+    }
+    .rotator-text.is-out { opacity: 0; transform: translateY(12px); }
+    .rotator-text.is-in { opacity: 1; transform: translateY(0); transition: opacity .45s ease, transform .45s ease; }
+    .rotator-dots { display: flex; gap: 6px; margin-top: 16px; }
+    .rotator-dots i {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,.35);
+      display: block;
+    }
+    .rotator-dots i.on { background: var(--gold); width: 22px; border-radius: 8px; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .stats {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      margin-top: 36px; max-width: 560px;
+    }
+    .stat {
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      border-radius: 16px; padding: 14px 12px; text-align: center;
+    }
+    .stat b { display: block; font-size: 1.2rem; }
+    .stat span { font-size: .75rem; opacity: .85; }
+
+    section { padding: 64px 0; }
+    h2 { font-size: clamp(1.5rem, 3.5vw, 2rem); color: var(--navy); margin-bottom: 8px; }
+    .sub { color: var(--muted); margin-bottom: 28px; max-width: 46ch; }
+
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+    .card {
+      background: #fff; border-radius: 20px; padding: 22px 20px;
+      box-shadow: 0 10px 30px rgba(190,24,93,.08);
+      border: 1px solid #fce7f3;
+    }
+    .card .ico { font-size: 1.8rem; margin-bottom: 8px; }
+    .card h3 { font-size: 1.05rem; margin-bottom: 6px; color: var(--rose); }
+
+    .manifesto {
+      background: linear-gradient(180deg, #1e3a5f, #3b1d3a);
+      color: #fff;
+    }
+    .manifesto h2 { color: #fff; }
+    .manifesto .sub { color: rgba(255,255,255,.8); }
+    .quote {
+      font-size: clamp(1.15rem, 3vw, 1.45rem);
+      font-weight: 800; line-height: 1.45;
+      margin-bottom: 18px;
+    }
+    .quote span { color: var(--gold); }
+    .manifesto p.body-copy { max-width: 52ch; opacity: .92; margin-bottom: 14px; }
+
+    .why { background: linear-gradient(180deg, #fff, #fdf2f8); }
+    .list { display: grid; gap: 12px; }
+    .item {
+      display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: start;
+      background: #fff; border-radius: 16px; padding: 14px 16px; border: 1px solid #fbcfe8;
+    }
+    .item .n {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: grid; place-items: center;
+      background: #fce7f3; font-weight: 900; color: var(--rose);
+    }
+
+    .airports { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      background: #fff; border: 1px solid #f9a8d4; color: var(--rose);
+      border-radius: 999px; padding: 8px 14px; font-size: .85rem; font-weight: 700;
+    }
+    .chip.dark {
+      background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.3); color: #fff;
+    }
+
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+    .step {
+      position: relative; background: var(--navy); color: #fff;
+      border-radius: 20px; padding: 22px 18px;
+    }
+    .step em { color: var(--gold); font-style: normal; font-size: .8rem; letter-spacing: .08em; }
+
+    .notice {
+      background: #fff7ed; border-left: 4px solid #f59e0b;
+      padding: 14px 16px; border-radius: 0 12px 12px 0; font-size: .88rem; color: #9a3412;
+    }
+
+
+    .who-sec { background:#fff; padding:48px 0; }
+    .who-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+    .who-card {
+      display:block; text-decoration:none; background:#fff7fb;
+      border:1px solid #fbcfe8; border-radius:18px; padding:16px 14px;
+    }
+    .who-card b { display:block; color:var(--rose); font-size:1.02rem; margin-bottom:4px; }
+    .who-card span { display:block; color:var(--muted); font-size:.84rem; }
+    footer {
+      background: #1e3a5f; color: #e5e7eb; padding: 36px 0 24px; font-size: .88rem;
+    }
+    footer a { color: #f9a8d4; }
+    .foot-brand { font-family: "Ma Shan Zheng", serif; font-size: 1.6rem; color: #fff; margin-bottom: 8px; }
+
+    .sticky-bar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+      display: flex; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      background: rgba(255,255,255,.94); border-top: 1px solid #fbcfe8;
+      backdrop-filter: blur(10px);
+    }
+    .sticky-bar .btn { flex: 1; }
+    body { padding-bottom: 76px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="wrap inner">
+      <a class="brand" href="#top">💝心星⭐️機場接送</a>
+      <div class="nav-links">
+        <a class="ghost" href="#who">給誰坐</a>
+        <a class="ghost" href="#value">服務有價</a>
+        <a class="ghost" href="#services">項目</a>
+        <a class="ghost" href="#flow">流程</a>
+        <a class="btn btn-pink" href="book.html" target="_blank" rel="noopener">立即預約</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">TAIWAN · AIRPORT TRANSFER · TAICHUNG</div>
+        <h1>全台機場接送<br>台中地區<span>專業</span>服務</h1>
+        <p class="lead">給時間不能賭的人。全台可預約，主場在台中：醫師、律師、主管與家庭往返桃園、小港，專人確認車次，車廂整潔備水，不催速、不談隱私。</p>
+        <div class="cta-row">
+          <a class="btn btn-gold" href="book.html" target="_blank" rel="noopener">📝 線上填表預約</a>
+          <a class="btn btn-line" href="https://lin.ee/XI6z6T8" target="_blank" rel="noopener">💬 加入官方 LINE</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>全台</b><span>皆可預約出車</span></div>
+          <div class="stat"><b>台中</b><span>地區專業主場</span></div>
+          <div class="stat"><b>專人</b><span>人工確認報價</span></div>
+        </div>
+      </div>
+      <aside class="rotator" aria-live="polite">
+        <div class="tag">也許你有以下疑問</div>
+        <div class="rotator-text is-in" id="rotatorText">您還在擔心機場接送司機遲到嗎？</div>
+        <div class="rotator-dots" id="rotatorDots"></div>
+      </aside>
+    </div>
+  </header>
+
+
+  <section class="who-sec" id="who">
+    <div class="wrap">
+      <h2>給時間不能亂的人</h2>
+      <p class="sub">職業不同，在意的事情很像：準時、車乾淨、司機清醒、價錢一次講完。</p>
+      <div class="who-grid">
+        <a class="who-card" href="taichung-taoyuan.html">
+          <b>醫師／醫護</b>
+          <span>門診或開刀隔天要出國、落地還要回診。時間先鎖定。</span>
+        </a>
+        <a class="who-card" href="taichung-taoyuan.html">
+          <b>工程師／科技</b>
+          <span>竹科、中科出差或出國開會，紅眼班機也走預約。</span>
+        </a>
+        <a class="who-card" href="taichung-taoyuan.html">
+          <b>老師／教育</b>
+          <span>寒暑假帶家人出國，行李多改九人座，出發時間先約好。</span>
+        </a>
+        <a class="who-card" href="taichung-taoyuan.html">
+          <b>律師／主管</b>
+          <span>開庭、董事會隔天的班機，車上少閒聊、不談案情。</span>
+        </a>
+        <a class="who-card" href="taichung-9seater.html">
+          <b>家庭出國</b>
+          <span>長輩加小孩、推車與大箱，先寫人數行李再決定車型。</span>
+        </a>
+        <a class="who-card" href="taichung-xiaogang.html">
+          <b>小港長途</b>
+          <span>機票在高雄、人在台中，不想轉高鐵再叫車。</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="manifesto" id="value">
+    <div class="wrap">
+      <h2>我們為什麼不拼低價</h2>
+      <p class="sub">低價背後，常常不是「比較划算」，而是有人在用體力硬撐。</p>
+      <p class="quote">市場抽成過重時，司機只能用<strong>更長工時、更多單量</strong>把錢賺回來。<br>乘客感受到的，可能是<span>打瞌睡、車身晃、催油門、急煞</span>——那不是個性，是疲勞。</p>
+      <p class="body-copy">行車安全不是口號。精神與體能異常時，車內會有極度不安定感，嚴重時甚至是生命風險。心星選擇做<strong>有口碑、服務有價</strong>的預約接送：讓駕駛不必靠爆單過活，才能把注意力留給你這趟路。</p>
+      <p class="body-copy">所以報價可能不會是市場最低。那一筆差額，換的是清醒、整潔、準時，以及你敢把家人交給我們。</p>
+      <div class="airports" style="margin-top:20px;">
+        <span class="chip dark">車內無異味</span>
+        <span class="chip dark">車廂整潔</span>
+        <span class="chip dark">備水給客人</span>
+        <span class="chip dark">不趕單、不催速</span>
+        <span class="chip dark">專人報價確認</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="wrap">
+      <h2>服務範圍：全台，主場台中</h2>
+      <p class="sub">北部、中部、南部皆可預約。航站含桃園、松山、清泉岡、高雄小港。台中往返桃園、小港為目前主打路線。</p>
+      <div class="cards" style="margin-bottom:16px">
+        <article class="card">
+          <div class="ico">🛫</div>
+          <h3><a href="taichung-taoyuan.html">台中 ↔ 桃園機場</a></h3>
+          <p>西屯、北屯、南屯、太平、逢甲到府。國際線長途主打。</p>
+        </article>
+        <article class="card">
+          <div class="ico">🛬</div>
+          <h3><a href="taichung-xiaogang.html">台中 ↔ 小港機場</a></h3>
+          <p>台中直送高雄小港，適合行李多、不想轉高鐵。</p>
+        </article>
+        <article class="card">
+          <div class="ico">🚐</div>
+          <h3><a href="taichung-9seater.html">台中九人座</a></h3>
+          <p>家人同行或行李超過兩件大箱，優先九人座。</p>
+        </article>
+      </div>
+      <div class="cards">
+        <article class="card">
+          <div class="ico">✈️</div>
+          <h3>送機</h3>
+          <p>請填「預計出發時間」。建議北部提前約 3 小時、中部 4 小時、南部 6 小時抵達機場。</p>
+        </article>
+        <article class="card">
+          <div class="ico">🛬</div>
+          <h3>接機</h3>
+          <p>請填「航班落地時間」。航站免費等候 60 分鐘，自落地起算。</p>
+        </article>
+        <article class="card">
+          <div class="ico">🔁</div>
+          <h3>送機＋接機來回</h3>
+          <p>同一張表一次填兩段，摘要可一起貼到 LINE。</p>
+        </article>
+        <article class="card">
+          <div class="ico">🚌</div>
+          <h3>包車旅遊／點對點</h3>
+          <p>全台客製路線，可加停靠點、舉牌、安全座椅。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="why" id="why">
+    <div class="wrap">
+      <h2>心星堅持的車室標準</h2>
+      <p class="sub">這些不是加購精品，是基本款。</p>
+      <div class="list">
+        <div class="item"><div class="n">淨</div><div><strong>車內無異味、整潔</strong><br>出發前整理車廂。異味與髒亂不該是「便宜的代價」。</div></div>
+        <div class="item"><div class="n">水</div><div><strong>備水給客人使用</strong><br>長途、清晨送機、落地接機，先有水再談其他。</div></div>
+        <div class="item"><div class="n">穩</div><div><strong>不靠趕單刺激感官</strong><br>不為了趕下一單催速、急煞。讓你在後座坐得住。</div></div>
+        <div class="item"><div class="n">價</div><div><strong>服務有價，才有餘裕把車開好</strong><br>合理車資讓駕駛能休息、能準備，而不是用疲勞換低價。</div></div>
+      </div>
+      <div class="airports" style="margin-top:18px;">
+        <span class="chip">桃園 T1／T2／T3</span>
+        <span class="chip">松山國內／國際</span>
+        <span class="chip">清泉岡</span>
+        <span class="chip">高雄小港</span>
+        <span class="chip">全台出發地</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="flow">
+    <div class="wrap">
+      <h2>預約只要三步</h2>
+      <p class="sub">不用註冊。填完請專人報價，確認後再出車。</p>
+      <div class="steps">
+        <div class="step"><em>STEP 01</em><h3>線上填表</h3><p>選擇送機／接機／來回，填地址、時間、人數與行李。</p></div>
+        <div class="step"><em>STEP 02</em><h3>複製摘要</h3><p>確認視窗複製內容，貼到官方 LINE「心星機場接送」。</p></div>
+        <div class="step"><em>STEP 03</em><h3>專人回覆</h3><p>確認車資與出車時間後再履約。未貼 LINE 不視為成立。</p></div>
+      </div>
+      <p class="notice" style="margin-top:22px;">
+        夜間 22:00–06:00、過年期間可能加價。未滿 3 歲兒童依法需安全座椅，未加購可能無法出車。車資以官方 LINE 確認為準，本站不承諾市場最低價。
+      </p>
+      <div class="cta-row" style="margin-top:22px;">
+        <a class="btn btn-pink" href="book.html" target="_blank" rel="noopener">前往預約表單</a>
+        <a class="btn btn-line" href="https://lin.ee/XI6z6T8" target="_blank" rel="noopener">先加 LINE 也行</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="foot-brand">心星機場接送</div>
+      <p>💝心星⭐️機場接送　·　全台接送　·　服務有價　·　專人報價</p>
+      <p style="margin-top:8px;">官方 LINE：<a href="https://lin.ee/XI6z6T8" target="_blank" rel="noopener">lin.ee/XI6z6T8</a></p>
+      <p style="margin-top:14px;opacity:.7;">本頁為服務介紹。實際車資、車型與可否出車，以官方 LINE 確認為準。</p>
+    </div>
+  </footer>
+
+  <div class="sticky-bar">
+    <a class="btn btn-pink" href="book.html" target="_blank" rel="noopener">立即預約</a>
+    <a class="btn btn-line" href="https://lin.ee/XI6z6T8" target="_blank" rel="noopener">官方 LINE</a>
+  </div>
+  <script>
+    (function () {
+      var palettes = [
+        { overlay: 'rgba(46,64,87,.38), rgba(168,85,106,.42)', blob: '#f5c6aa', base: '#2f4858, #8d6b7a 55%, #d4a574 140%', glow: 'rgba(245,193,75,.32)', page: '#fff8f3' },
+        { overlay: 'rgba(55,65,81,.32), rgba(90,122,138,.40)', blob: '#b7d3c8', base: '#3d5a5b, #7a9e9f 55%, #cfe0c3 140%', glow: 'rgba(180,220,200,.35)', page: '#f4faf6' },
+        { overlay: 'rgba(70,55,90,.34), rgba(150,120,160,.38)', blob: '#e8d5f2', base: '#3d3558, #8b6d9c 55%, #e4c1b8 140%', glow: 'rgba(232,200,230,.35)', page: '#faf5fb' },
+        { overlay: 'rgba(50,70,90,.34), rgba(100,140,160,.38)', blob: '#c5e4f3', base: '#2c4a62, #5b8fa8 55%, #f0d9b5 140%', glow: 'rgba(180,220,240,.32)', page: '#f3f8fb' },
+        { overlay: 'rgba(80,55,50,.32), rgba(180,110,90,.36)', blob: '#f3d2c1', base: '#5c3d3a, #c0896e 55%, #ead7b4 140%', glow: 'rgba(245,200,150,.32)', page: '#fff6ef' },
+        { overlay: 'rgba(45,70,65,.34), rgba(80,130,110,.36)', blob: '#d4ead4', base: '#35524a, #6a9e8a 55%, #e8d5a3 140%', glow: 'rgba(200,230,180,.3)', page: '#f5faf4' },
+        { overlay: 'rgba(75,50,70,.34), rgba(190,24,93,.28)', blob: '#fdc5d8', base: '#4a3048, #c06c84 55%, #f7d6b8 140%', glow: 'rgba(255,180,200,.3)', page: '#fff7fb' }
+      ];
+      var p = palettes[Math.floor(Math.random() * palettes.length)];
+      var hero = document.querySelector('.hero');
+      if (hero) {
+        hero.style.background =
+          'linear-gradient(180deg, ' + p.overlay + '), radial-gradient(circle at 20% 20%, ' + p.blob + ' 0%, transparent 42%), linear-gradient(135deg, ' + p.base + ')';
+      }
+      document.body.style.background = p.page;
+      var after = document.createElement('style');
+      after.textContent = '.hero::after{background:radial-gradient(circle,' + p.glow + ',transparent 60%)}';
+      document.head.appendChild(after);
+
+      var lines = [
+        '您還在擔心機場接送司機遲到嗎？',
+        '您還在擔心司機開車常打瞌睡、注意力不集中嗎？',
+        '您還在擔心車速忽快忽慢、急煞讓人坐不住嗎？',
+        '您還在擔心車內有異味、座位不整潔嗎？',
+        '您還在擔心低價接單，換來疲勞駕駛嗎？',
+        '心星選擇服務有價：準時、清醒、整潔、備水。'
+      ];
+      var el = document.getElementById('rotatorText');
+      var dots = document.getElementById('rotatorDots');
+      if (!el || !dots) return;
+      lines.forEach(function (_, i) {
+        var d = document.createElement('i');
+        if (i === 0) d.className = 'on';
+        dots.appendChild(d);
+      });
+      var i = 0;
+      setInterval(function () {
+        el.classList.remove('is-in');
+        el.classList.add('is-out');
+        setTimeout(function () {
+          i = (i + 1) % lines.length;
+          el.textContent = lines[i];
+          Array.prototype.forEach.call(dots.children, function (d, idx) {
+            d.className = idx === i ? 'on' : '';
+          });
+          el.classList.remove('is-out');
+          el.classList.add('is-in');
+        }, 420);
+      }, 3200);
+    })();
+  </script>
+</body>
+</html>
